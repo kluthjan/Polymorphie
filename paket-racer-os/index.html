@@ -290,12 +290,14 @@
       width: 0%;
     }
 
-    /* The van (SVG drawn in CSS) */
+    /* The van */
     #boot-van {
       position: absolute;
       bottom: 18px; /* sits on road */
       left: 0%;
-      font-size: 2.8rem;
+      width: 100px;
+      height: 70px;
+      background: url('loading.png') center/contain no-repeat;
       transition: left 0.15s ease;
       filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
       /* Bounce animation */
@@ -513,7 +515,7 @@
   <p class="boot-sub">Version 11.0 (Sehr Schnell Edition)</p>
 
   <div class="boot-road">
-    <div id="boot-van">🚐</div>
+    <div id="boot-van"></div>
     <div class="boot-road-fill" id="boot-road-fill"></div>
     <div class="boot-road-track"></div>
   </div>
