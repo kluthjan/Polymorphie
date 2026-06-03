@@ -1,842 +1,830 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Java OOP – Modul 4: Polymorphie</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <title>Java OOP Modul 4 – Polymorphie | Vollständige Erklärung</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
-    /* ===== RESET & ROOT ===== */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0d1117;--bg2:#161b22;--bg3:#1c2330;--bg4:#21262d;--bgc:#0a0e14;
+      --b1:#30363d;--b2:#3d444d;
+      --t1:#e6edf3;--t2:#8b949e;--t3:#6e7681;--t4:#484f58;
+      --blue:#58a6ff;--purple:#bc8cff;--green:#3fb950;--orange:#ffa657;
+      --red:#ff7b72;--teal:#39d353;--pink:#f778ba;--yellow:#e3b341;
+      --cyan:#76e3ea;
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);line-height:1.7;overflow-x:hidden}
+    ::-webkit-scrollbar{width:7px}
+    ::-webkit-scrollbar-track{background:var(--bg)}
+    ::-webkit-scrollbar-thumb{background:#30363d;border-radius:4px}
 
-    :root {
-      --bg-base:     #0d1117;
-      --bg-card:     #161b22;
-      --bg-card2:    #1c2330;
-      --bg-code:     #0e1419;
-      --border:      #30363d;
-      --border-glow: #58a6ff33;
-      --text-main:   #e6edf3;
-      --text-muted:  #8b949e;
-      --text-dim:    #6e7681;
-      --accent-blue: #58a6ff;
-      --accent-purple:#bc8cff;
-      --accent-green: #3fb950;
-      --accent-orange:#ffa657;
-      --accent-red:   #ff7b72;
-      --accent-teal:  #39d353;
-      --accent-pink:  #f778ba;
-      --grad-1: linear-gradient(135deg, #1e3a5f 0%, #0d1117 60%);
-      --grad-hero: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+    /* ── NAV ── */
+    nav{
+      position:fixed;top:0;left:0;right:0;z-index:200;
+      background:rgba(13,17,23,.95);backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--b1);
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 1.5rem;height:58px;gap:1rem;
     }
+    .nav-logo{font-size:.9rem;font-weight:800;white-space:nowrap;
+      background:linear-gradient(90deg,var(--blue),var(--purple));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .nav-links{display:flex;gap:.1rem;list-style:none;overflow-x:auto;flex-shrink:1}
+    .nav-links a{color:var(--t3);text-decoration:none;font-size:.75rem;
+      padding:.3rem .6rem;border-radius:6px;white-space:nowrap;
+      transition:color .15s,background .15s}
+    .nav-links a:hover,.nav-links a.active{color:var(--t1);background:var(--bg3)}
 
-    html { scroll-behavior: smooth; }
+    /* ── HERO ── */
+    .hero{
+      min-height:100vh;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;text-align:center;
+      padding:80px 1.5rem 4rem;
+      background:radial-gradient(ellipse 70% 50% at 50% 40%,#58a6ff0d 0%,transparent 70%);
+    }
+    .badge{
+      display:inline-flex;align-items:center;gap:.5rem;
+      background:#58a6ff12;border:1px solid #58a6ff30;
+      color:var(--blue);padding:.3rem .9rem;border-radius:100px;
+      font-size:.77rem;font-weight:700;letter-spacing:.5px;margin-bottom:1.8rem;
+      animation:fd .5s ease both;
+    }
+    .hero h1{
+      font-size:clamp(2.2rem,5.5vw,3.8rem);font-weight:900;
+      letter-spacing:-1.5px;line-height:1.1;margin-bottom:1.2rem;
+      animation:fd .6s ease .1s both;
+    }
+    .hero h1 em{
+      font-style:normal;
+      background:linear-gradient(135deg,var(--blue),var(--purple));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    }
+    .hero-sub{
+      color:var(--t2);font-size:1.05rem;max-width:620px;
+      margin:0 auto 2.5rem;animation:fd .6s ease .2s both;
+    }
+    .hero-pills{display:flex;gap:.7rem;flex-wrap:wrap;justify-content:center;margin-bottom:3rem;animation:fd .6s ease .3s both}
+    .pill{
+      background:var(--bg2);border:1px solid var(--b1);
+      border-radius:8px;padding:.5rem 1rem;font-size:.82rem;color:var(--t2);
+      display:flex;align-items:center;gap:.45rem;
+    }
+    .pill-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+    @keyframes fd{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg-base);
-      color: var(--text-main);
-      line-height: 1.7;
-      overflow-x: hidden;
-    }
+    /* ── LAYOUT ── */
+    .wrap{max-width:920px;margin:0 auto;padding:0 1.5rem}
+    section{padding:5rem 0}
+    .sec-label{font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:.7rem}
+    .sec-title{font-size:clamp(1.5rem,3vw,2.1rem);font-weight:800;letter-spacing:-.7px;margin-bottom:.9rem}
+    .sec-desc{color:var(--t2);font-size:.97rem;max-width:750px;margin-bottom:2.5rem;line-height:1.85}
+    .divider{height:1px;background:var(--b1)}
 
-    /* ===== SCROLLBAR ===== */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: var(--bg-base); }
-    ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #58a6ff55; }
+    /* ── COLORS ── */
+    .c-blue{color:var(--blue)}.c-purple{color:var(--purple)}.c-green{color:var(--green)}
+    .c-orange{color:var(--orange)}.c-red{color:var(--red)}.c-pink{color:var(--pink)}
+    .c-yellow{color:var(--yellow)}.c-cyan{color:var(--cyan)}
 
-    /* ===== NAV ===== */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      background: rgba(13, 17, 23, 0.92);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 2rem;
-      display: flex; align-items: center; justify-content: space-between;
-      height: 60px;
+    /* ── ANALOGY BOX ── */
+    .analogy{
+      background:linear-gradient(135deg,#58a6ff08,#bc8cff08);
+      border:1px solid #58a6ff25;border-radius:14px;
+      padding:1.4rem 1.6rem;margin:1.2rem 0;
     }
-    .nav-brand {
-      font-size: 1rem; font-weight: 700;
-      background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      letter-spacing: -0.3px;
-    }
-    .nav-links {
-      display: flex; gap: 0.2rem; list-style: none;
-      overflow-x: auto; max-width: 75vw;
-    }
-    .nav-links a {
-      color: var(--text-muted); text-decoration: none;
-      font-size: 0.78rem; padding: 0.3rem 0.7rem; border-radius: 6px;
-      white-space: nowrap;
-      transition: color 0.2s, background 0.2s;
-    }
-    .nav-links a:hover { color: var(--text-main); background: var(--bg-card2); }
+    .analogy-title{font-weight:700;font-size:.92rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
+    .analogy p{color:var(--t2);font-size:.9rem;line-height:1.8}
+    .analogy p+p{margin-top:.5rem}
 
-    /* ===== HERO ===== */
-    .hero {
-      min-height: 100vh;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      text-align: center;
-      padding: 100px 2rem 4rem;
-      background: var(--grad-hero);
-      position: relative; overflow: hidden;
+    /* ── CONCEPT CARD ── */
+    .ccard{
+      background:var(--bg2);border:1px solid var(--b1);
+      border-radius:14px;padding:1.4rem;margin-bottom:1.2rem;
+      position:relative;overflow:hidden;
     }
-    .hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse 60% 40% at 30% 40%, #58a6ff12 0%, transparent 70%),
-        radial-gradient(ellipse 50% 35% at 70% 60%, #bc8cff0e 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      background: #58a6ff15; border: 1px solid #58a6ff33;
-      color: var(--accent-blue); padding: 0.35rem 1rem;
-      border-radius: 100px; font-size: 0.8rem; font-weight: 600;
-      margin-bottom: 1.8rem; letter-spacing: 0.5px;
-      animation: fadeDown 0.6s ease;
-    }
-    .hero h1 {
-      font-size: clamp(2.4rem, 6vw, 4rem);
-      font-weight: 800; letter-spacing: -1.5px;
-      line-height: 1.1; margin-bottom: 1.2rem;
-      animation: fadeDown 0.7s ease 0.1s both;
-    }
-    .hero h1 span {
-      background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .hero-sub {
-      font-size: 1.15rem; color: var(--text-muted);
-      max-width: 600px; margin: 0 auto 2.5rem;
-      animation: fadeDown 0.7s ease 0.2s both;
-    }
-    .hero-cards {
-      display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
-      margin-bottom: 3rem;
-      animation: fadeDown 0.7s ease 0.3s both;
-    }
-    .hero-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px; padding: 1rem 1.5rem;
-      font-size: 0.85rem; color: var(--text-muted);
-      display: flex; align-items: center; gap: 0.5rem;
-    }
-    .hero-card .dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .dot-blue   { background: var(--accent-blue); }
-    .dot-purple { background: var(--accent-purple); }
-    .dot-green  { background: var(--accent-green); }
-    .dot-orange { background: var(--accent-orange); }
-    .scroll-hint {
-      animation: bounce 2s infinite;
-      color: var(--text-dim); font-size: 0.8rem;
-      display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
-    }
-    .scroll-hint span { font-size: 1.2rem; }
+    .ccard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+    .ccard.blue::before{background:linear-gradient(90deg,var(--blue),transparent)}
+    .ccard.purple::before{background:linear-gradient(90deg,var(--purple),transparent)}
+    .ccard.green::before{background:linear-gradient(90deg,var(--green),transparent)}
+    .ccard.orange::before{background:linear-gradient(90deg,var(--orange),transparent)}
+    .ccard.red::before{background:linear-gradient(90deg,var(--red),transparent)}
+    .ccard.pink::before{background:linear-gradient(90deg,var(--pink),transparent)}
+    .ccard.yellow::before{background:linear-gradient(90deg,var(--yellow),transparent)}
+    .ccard.cyan::before{background:linear-gradient(90deg,var(--cyan),transparent)}
+    .ccard-head{display:flex;align-items:center;gap:.7rem;margin-bottom:.8rem}
+    .ccard-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+    .ccard-title{font-weight:700;font-size:.95rem}
+    .ccard p{color:var(--t2);font-size:.9rem;line-height:1.8}
+    .ccard p+p{margin-top:.5rem}
 
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(6px); }
+    /* ── STEP ACCORDION ── */
+    .steps{display:flex;flex-direction:column;gap:.9rem}
+    .step{background:var(--bg2);border:1px solid var(--b1);border-radius:14px;overflow:hidden;transition:border-color .2s}
+    .step:hover{border-color:#58a6ff35}
+    .step-hdr{
+      display:flex;align-items:center;gap:1rem;padding:1.1rem 1.4rem;
+      cursor:pointer;user-select:none;
     }
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-16px); }
-      to   { opacity: 1; transform: translateY(0); }
+    .step-num{
+      width:30px;height:30px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      font-weight:800;font-size:.82rem;flex-shrink:0;
     }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+    .step-info{flex:1}
+    .step-name{font-weight:700;font-size:.92rem}
+    .step-hint{color:var(--t3);font-size:.78rem;margin-top:.1rem}
+    .step-arr{color:var(--t4);transition:transform .25s;font-size:.75rem}
+    .step.open .step-arr{transform:rotate(180deg)}
+    .step-body{display:none;padding:0 1.4rem 1.4rem}
+    .step.open .step-body{display:block}
+    .step-body>p{color:var(--t2);font-size:.9rem;line-height:1.8;margin-bottom:.9rem}
+    .step-body>p:last-child{margin-bottom:0}
 
-    /* ===== SECTIONS ===== */
-    .container {
-      max-width: 900px; margin: 0 auto; padding: 0 1.5rem;
+    /* ── HOW-TO BOX ── */
+    .howto{
+      background:#3fb95010;border:1px solid #3fb95030;
+      border-radius:12px;padding:1.1rem 1.3rem;margin:1rem 0;
     }
-
-    section {
-      padding: 5rem 0;
+    .howto-title{
+      font-weight:800;font-size:.83rem;color:var(--green);
+      letter-spacing:.3px;margin-bottom:.7rem;
+      display:flex;align-items:center;gap:.4rem;
+    }
+    .howto ol,.howto ul{padding-left:1.3rem;color:var(--t2);font-size:.88rem;line-height:2}
+    .howto li{padding-left:.2rem}
+    .howto li strong{color:var(--t1)}
+    .howto li code{
+      background:#ffffff10;border-radius:4px;
+      padding:.05rem .35rem;font-family:'JetBrains Mono',monospace;font-size:.8rem;
+      color:var(--blue);
     }
 
-    .section-label {
-      font-size: 0.75rem; font-weight: 700; letter-spacing: 2px;
-      text-transform: uppercase; margin-bottom: 0.8rem;
+    /* ── WARN / INFO / TIP / DANGER ── */
+    .callout{border-radius:10px;padding:.9rem 1.1rem;margin:.9rem 0;display:flex;gap:.7rem;align-items:flex-start;border:1px solid}
+    .callout-icon{font-size:.95rem;flex-shrink:0;margin-top:.1rem}
+    .callout-body{font-size:.87rem;line-height:1.75}
+    .callout-body strong{display:block;margin-bottom:.2rem;font-size:.9rem}
+    .callout-body p{margin:0}
+    .callout.info{background:#58a6ff10;border-color:#58a6ff30;color:var(--blue)}
+    .callout.info p{color:var(--t2)}
+    .callout.tip{background:#3fb95010;border-color:#3fb95030;color:var(--green)}
+    .callout.tip p{color:var(--t2)}
+    .callout.warn{background:#ffa65710;border-color:#ffa65730;color:var(--orange)}
+    .callout.warn p{color:var(--t2)}
+    .callout.danger{background:#ff7b7210;border-color:#ff7b7230;color:var(--red)}
+    .callout.danger p{color:var(--t2)}
+    .callout.purple-c{background:#bc8cff10;border-color:#bc8cff30;color:var(--purple)}
+    .callout.purple-c p{color:var(--t2)}
+
+    /* ── CODE ── */
+    .code-wrap{background:var(--bgc);border:1px solid var(--b1);border-radius:12px;overflow:hidden;margin:.9rem 0;font-family:'JetBrains Mono',monospace}
+    .code-bar{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:.5rem 1rem;background:var(--bg2);border-bottom:1px solid var(--b1);
     }
-    .section-title {
-      font-size: clamp(1.6rem, 3vw, 2.2rem);
-      font-weight: 800; letter-spacing: -0.8px; margin-bottom: 1rem;
+    .code-dots{display:flex;gap:5px}
+    .cd{width:10px;height:10px;border-radius:50%}
+    .cd-r{background:#ff5f57}.cd-y{background:#febc2e}.cd-g{background:#28c840}
+    .code-fname{font-size:.7rem;color:var(--t3);letter-spacing:.5px}
+    pre{padding:1.1rem 1.2rem;overflow-x:auto;font-size:.81rem;line-height:1.75;color:#c9d1d9}
+    code{display:block}
+
+    /* syntax */
+    .kw{color:#ff7b72}.tp{color:#ffa657}.str{color:#a5d6ff}.num{color:#79c0ff}
+    .cm{color:#6e8196;font-style:italic}.fn{color:#d2a8ff}.an{color:#ffa657}
+    .cls{color:#ffa657}.op{color:#ff7b72}.bool{color:#ff7b72}
+    .hl{background:#58a6ff18;border-left:3px solid var(--blue);display:block;
+        margin-left:-1.2rem;padding-left:.9rem;padding-right:1.2rem}
+    .hl-green{background:#3fb95015;border-left:3px solid var(--green);display:block;
+              margin-left:-1.2rem;padding-left:.9rem;padding-right:1.2rem}
+    .hl-red{background:#ff7b7215;border-left:3px solid var(--red);display:block;
+            margin-left:-1.2rem;padding-left:.9rem;padding-right:1.2rem}
+    .hl-orange{background:#ffa65715;border-left:3px solid var(--orange);display:block;
+               margin-left:-1.2rem;padding-left:.9rem;padding-right:1.2rem}
+
+    /* ── OUTPUT ── */
+    .output{
+      background:#050911;border:1px solid #3fb95030;border-radius:10px;
+      padding:.9rem 1.1rem;font-family:'JetBrains Mono',monospace;
+      font-size:.8rem;color:var(--teal);margin:.9rem 0;
     }
-    .section-desc {
-      color: var(--text-muted); font-size: 1rem;
-      max-width: 700px; margin-bottom: 2.5rem; line-height: 1.8;
+    .output-lbl{
+      font-family:'Inter',sans-serif;font-size:.68rem;font-weight:700;
+      letter-spacing:1.5px;text-transform:uppercase;color:var(--t4);
+      margin-bottom:.5rem;
     }
 
-    /* ===== DIVIDER ===== */
-    .divider {
-      height: 1px; background: var(--border);
-      margin: 0;
-    }
+    /* ── COMPARE ── */
+    .compare{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin:.9rem 0}
+    .compare-box{background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:1rem}
+    .compare-box.bad{border-color:#ff7b7230;background:#ff7b7208}
+    .compare-box.good{border-color:#3fb95030;background:#3fb95008}
+    .compare-lbl{font-size:.73rem;font-weight:700;letter-spacing:.5px;margin-bottom:.5rem}
+    .compare-box.bad .compare-lbl{color:var(--red)}
+    .compare-box.good .compare-lbl{color:var(--green)}
+    .compare-box p{color:var(--t2);font-size:.85rem;line-height:1.7}
 
-    /* ===== CONCEPT BOX ===== */
-    .concept {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      position: relative; overflow: hidden;
-    }
-    .concept::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    }
-    .concept.blue::before   { background: linear-gradient(90deg, var(--accent-blue), transparent); }
-    .concept.purple::before { background: linear-gradient(90deg, var(--accent-purple), transparent); }
-    .concept.green::before  { background: linear-gradient(90deg, var(--accent-green), transparent); }
-    .concept.orange::before { background: linear-gradient(90deg, var(--accent-orange), transparent); }
-    .concept.red::before    { background: linear-gradient(90deg, var(--accent-red), transparent); }
-    .concept.teal::before   { background: linear-gradient(90deg, var(--accent-teal), transparent); }
-    .concept.pink::before   { background: linear-gradient(90deg, var(--accent-pink), transparent); }
+    /* ── TABLE ── */
+    table{width:100%;border-collapse:collapse;font-size:.84rem;margin:.9rem 0;overflow:hidden;border-radius:10px;border:1px solid var(--b1)}
+    th{background:var(--bg3);color:var(--t1);font-weight:700;padding:.65rem 1rem;text-align:left}
+    td{padding:.6rem 1rem;border-top:1px solid var(--b1);color:var(--t2)}
+    tr:hover td{background:#58a6ff06}
+    .tag{display:inline-block;padding:.12rem .55rem;border-radius:5px;font-size:.74rem;font-weight:700;font-family:'JetBrains Mono',monospace}
+    .tag-b{background:#58a6ff20;color:var(--blue)}
+    .tag-p{background:#bc8cff20;color:var(--purple)}
+    .tag-g{background:#3fb95020;color:var(--green)}
+    .tag-o{background:#ffa65720;color:var(--orange)}
+    .tag-r{background:#ff7b7220;color:var(--red)}
+    .tag-y{background:#e3b34120;color:var(--yellow)}
 
-    .concept-header {
-      display: flex; align-items: center; gap: 0.75rem;
-      margin-bottom: 0.8rem;
-    }
-    .concept-icon {
-      width: 36px; height: 36px; border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem; flex-shrink: 0;
-    }
-    .bg-blue   { background: #58a6ff20; }
-    .bg-purple { background: #bc8cff20; }
-    .bg-green  { background: #3fb95020; }
-    .bg-orange { background: #ffa65720; }
-    .bg-red    { background: #ff7b7220; }
-    .bg-teal   { background: #39d35320; }
-    .bg-pink   { background: #f778ba20; }
+    /* ── TREE ── */
+    .tree{background:var(--bgc);border:1px solid var(--b1);border-radius:12px;padding:1.1rem 1.4rem;font-family:'JetBrains Mono',monospace;font-size:.83rem;margin:.9rem 0;line-height:1.9}
+    .tr{color:var(--orange);font-weight:700}
+    .tc{margin-left:1.2rem;color:var(--t3);position:relative}
+    .tc::before{content:'├── ';color:var(--t4)}
+    .tc.last::before{content:'└── '}
+    .tc span{color:var(--blue);font-weight:600}
+    .tc small{color:var(--t4)}
 
-    .concept-title {
-      font-size: 1rem; font-weight: 700;
-    }
-    .concept p {
-      color: var(--text-muted); font-size: 0.93rem; line-height: 1.75;
-    }
-    .concept p + p { margin-top: 0.6rem; }
+    /* ── FLOW ── */
+    .flow{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:.8rem 0}
+    .fb{background:var(--bg3);border:1px solid var(--b1);border-radius:7px;padding:.4rem .8rem;font-size:.8rem;font-family:'JetBrains Mono',monospace}
+    .fa{color:var(--t4);font-size:.85rem}
+    .fb.b{border-color:#58a6ff40;color:var(--blue);background:#58a6ff0d}
+    .fb.g{border-color:#3fb95040;color:var(--green);background:#3fb9500d}
+    .fb.o{border-color:#ffa65740;color:var(--orange);background:#ffa6570d}
+    .fb.p{border-color:#bc8cff40;color:var(--purple);background:#bc8cff0d}
+    .fb.r{border-color:#ff7b7240;color:var(--red);background:#ff7b720d}
 
-    /* ===== STEPS ===== */
-    .steps { display: flex; flex-direction: column; gap: 1.2rem; }
+    /* ── GRID 2 ── */
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.9rem 0}
+    @media(max-width:580px){.grid2,.compare{grid-template-columns:1fr}}
 
-    .step {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .step:hover {
-      border-color: #58a6ff44;
-      box-shadow: 0 0 0 1px #58a6ff18;
-    }
+    /* ── MINI CARD ── */
+    .mc{background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:1rem}
+    .mc-title{font-weight:700;font-size:.85rem;margin-bottom:.4rem}
+    .mc p{color:var(--t2);font-size:.82rem;line-height:1.7}
 
-    .step-header {
-      display: flex; align-items: center; gap: 1rem;
-      padding: 1.2rem 1.5rem; cursor: pointer;
-      user-select: none;
-    }
-    .step-num {
-      width: 32px; height: 32px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
-    }
-    .step-info { flex: 1; }
-    .step-name { font-weight: 600; font-size: 0.95rem; }
-    .step-hint { color: var(--text-muted); font-size: 0.8rem; margin-top: 0.1rem; }
-    .step-toggle {
-      color: var(--text-dim); transition: transform 0.3s;
-      font-size: 0.8rem;
-    }
-    .step.open .step-toggle { transform: rotate(180deg); }
+    /* ── INLINE CODE ── */
+    ic,code.ic{background:#ffffff12;border-radius:4px;padding:.05rem .35rem;
+      font-family:'JetBrains Mono',monospace;font-size:.83em;color:var(--blue)}
 
-    .step-body {
-      display: none; padding: 0 1.5rem 1.5rem;
-    }
-    .step.open .step-body { display: block; }
+    /* ── REVEAL ── */
+    .rv{opacity:0;transform:translateY(20px);transition:opacity .45s ease,transform .45s ease}
+    .rv.vis{opacity:1;transform:none}
 
-    .step-body p {
-      color: var(--text-muted); font-size: 0.9rem;
-      line-height: 1.75; margin-bottom: 1rem;
+    /* ── PROGRESS ── */
+    .toc{background:var(--bg2);border:1px solid var(--b1);border-radius:14px;padding:1.4rem;margin-bottom:2.5rem}
+    .toc-title{font-weight:800;font-size:.9rem;margin-bottom:1rem}
+    .toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.5rem}
+    .toc-item{
+      display:flex;align-items:center;gap:.6rem;
+      background:var(--bg3);border:1px solid var(--b1);border-radius:8px;
+      padding:.5rem .8rem;text-decoration:none;
+      color:var(--t2);font-size:.8rem;transition:all .15s;
     }
+    .toc-item:hover{color:var(--t1);border-color:#58a6ff35;background:#58a6ff08}
+    .toc-num{font-weight:800;font-size:.75rem;color:var(--t4)}
 
-    /* ===== CODE BLOCK ===== */
-    .code-block {
-      background: var(--bg-code);
-      border: 1px solid var(--border);
-      border-radius: 12px; overflow: hidden;
-      margin: 1rem 0;
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .code-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0.6rem 1rem;
-      background: #161b22; border-bottom: 1px solid var(--border);
-    }
-    .code-lang {
-      font-size: 0.72rem; color: var(--text-dim); font-weight: 600;
-      letter-spacing: 1px; text-transform: uppercase;
-    }
-    .code-dots { display: flex; gap: 6px; }
-    .code-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .cd-red   { background: #ff5f57; }
-    .cd-yellow{ background: #febc2e; }
-    .cd-green { background: #28c840; }
-
-    pre {
-      padding: 1.2rem;
-      overflow-x: auto;
-      font-size: 0.82rem; line-height: 1.7;
-      color: #c9d1d9;
-    }
-    pre code { display: block; }
-
-    /* Syntax highlighting */
-    .kw  { color: #ff7b72; }  /* keyword */
-    .tp  { color: #ffa657; }  /* type */
-    .str { color: #a5d6ff; }  /* string */
-    .num { color: #79c0ff; }  /* number */
-    .cm  { color: #8b949e; font-style: italic; }  /* comment */
-    .fn  { color: #d2a8ff; }  /* function */
-    .an  { color: #ffa657; }  /* annotation */
-    .op  { color: #ff7b72; }  /* operator */
-    .cls { color: #ffa657; }  /* class name */
-    .hl  { background: #58a6ff15; border-left: 3px solid var(--accent-blue); padding-left: 0.5rem; display: block; margin-left: -1.2rem; padding-right: 1.2rem; }
-
-    /* ===== CALLOUT ===== */
-    .callout {
-      border-radius: 10px; padding: 1rem 1.2rem;
-      font-size: 0.88rem; margin: 1rem 0;
-      display: flex; gap: 0.75rem; align-items: flex-start;
-      border: 1px solid;
-    }
-    .callout-icon { font-size: 1rem; flex-shrink: 0; margin-top: 0.1rem; }
-    .callout-body { line-height: 1.7; }
-    .callout-body strong { display: block; margin-bottom: 0.2rem; font-size: 0.9rem; }
-
-    .callout.info   { background: #58a6ff12; border-color: #58a6ff33; color: #58a6ff; }
-    .callout.tip    { background: #3fb95012; border-color: #3fb95033; color: #3fb950; }
-    .callout.warn   { background: #ffa65712; border-color: #ffa65733; color: #ffa657; }
-    .callout.danger { background: #ff7b7212; border-color: #ff7b7233; color: #ff7b72; }
-    .callout p      { color: var(--text-muted); margin: 0; }
-
-    /* ===== TABLE ===== */
-    table {
-      width: 100%; border-collapse: collapse;
-      font-size: 0.85rem; margin: 1rem 0;
-    }
-    th {
-      background: var(--bg-card2);
-      color: var(--text-main); font-weight: 600;
-      padding: 0.7rem 1rem; text-align: left;
-      border-bottom: 1px solid var(--border);
-    }
-    td {
-      padding: 0.65rem 1rem;
-      border-bottom: 1px solid #21262d;
-      color: var(--text-muted);
-    }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #161b2255; }
-    .tag {
-      display: inline-block; padding: 0.15rem 0.6rem;
-      border-radius: 6px; font-size: 0.75rem; font-weight: 600;
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .tag-blue   { background: #58a6ff20; color: var(--accent-blue); }
-    .tag-purple { background: #bc8cff20; color: var(--accent-purple); }
-    .tag-green  { background: #3fb95020; color: var(--accent-green); }
-    .tag-orange { background: #ffa65720; color: var(--accent-orange); }
-    .tag-red    { background: #ff7b7220; color: var(--accent-red); }
-
-    /* ===== INHERITANCE TREE ===== */
-    .tree {
-      background: var(--bg-code);
-      border: 1px solid var(--border);
-      border-radius: 12px; padding: 1.2rem 1.5rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem; margin: 1rem 0;
-    }
-    .tree-root { color: var(--accent-orange); font-weight: 600; }
-    .tree-child {
-      margin-left: 1.5rem; position: relative; color: var(--text-muted);
-    }
-    .tree-child::before {
-      content: '├── '; color: var(--text-dim);
-    }
-    .tree-child.last::before { content: '└── '; }
-    .tree-child span { color: var(--accent-blue); }
-
-    /* ===== FLOW ===== */
-    .flow {
-      display: flex; align-items: center; gap: 0.5rem;
-      flex-wrap: wrap; margin: 1rem 0;
-    }
-    .flow-box {
-      background: var(--bg-card2); border: 1px solid var(--border);
-      border-radius: 8px; padding: 0.5rem 0.9rem;
-      font-size: 0.82rem; font-family: 'JetBrains Mono', monospace;
-    }
-    .flow-arrow { color: var(--text-dim); font-size: 0.9rem; }
-    .flow-box.blue { border-color: #58a6ff44; color: var(--accent-blue); background: #58a6ff10; }
-    .flow-box.green { border-color: #3fb95044; color: var(--accent-green); background: #3fb95010; }
-    .flow-box.orange { border-color: #ffa65744; color: var(--accent-orange); background: #ffa65710; }
-
-    /* ===== RESULT BOX ===== */
-    .result {
-      background: #0e1419;
-      border: 1px solid #3fb95033;
-      border-radius: 10px; padding: 1rem 1.2rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.82rem; color: var(--accent-teal);
-      margin: 1rem 0;
-    }
-    .result .result-label {
-      color: var(--text-dim); font-size: 0.7rem; letter-spacing: 1px;
-      text-transform: uppercase; font-weight: 600; margin-bottom: 0.5rem;
-      font-family: 'Inter', sans-serif;
-    }
-
-    /* ===== PROGRESS BAR ===== */
-    .progress-wrap {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px; padding: 1.5rem;
-      margin-bottom: 2rem;
-    }
-    .progress-title { font-weight: 700; margin-bottom: 1rem; font-size: 0.95rem; }
-    .progress-items { display: flex; flex-direction: column; gap: 0.7rem; }
-    .progress-item { display: flex; align-items: center; gap: 1rem; }
-    .progress-name { font-size: 0.83rem; width: 180px; flex-shrink: 0; color: var(--text-muted); }
-    .progress-bar-bg {
-      flex: 1; height: 6px; background: var(--bg-code);
-      border-radius: 100px; overflow: hidden;
-    }
-    .progress-bar-fill {
-      height: 100%; border-radius: 100px;
-      transition: width 1s ease;
-    }
-    .progress-pct { font-size: 0.78rem; color: var(--text-dim); width: 36px; text-align: right; flex-shrink: 0; }
-
-    /* ===== QUICK REF TABLE ===== */
-    .ref-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 1rem; margin: 1.5rem 0;
-    }
-    .ref-item {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px; padding: 1rem;
-    }
-    .ref-keyword {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem; font-weight: 600;
-      margin-bottom: 0.4rem;
-    }
-    .ref-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; }
-
-    /* ===== FOOTER ===== */
-    footer {
-      text-align: center; padding: 3rem 1rem;
-      color: var(--text-dim); font-size: 0.82rem;
-      border-top: 1px solid var(--border);
-    }
-
-    /* ===== SECTION COLORS ===== */
-    .c-blue { color: var(--accent-blue); }
-    .c-purple { color: var(--accent-purple); }
-    .c-green { color: var(--accent-green); }
-    .c-orange { color: var(--accent-orange); }
-    .c-red { color: var(--accent-red); }
-    .c-pink { color: var(--accent-pink); }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 600px) {
-      .nav-links { display: none; }
-      .hero h1 { font-size: 2rem; }
-      .ref-grid { grid-template-columns: 1fr; }
-      .progress-name { width: 120px; }
-    }
-
-    /* ===== ANIMATION ON SCROLL ===== */
-    .reveal {
-      opacity: 0; transform: translateY(24px);
-      transition: opacity 0.5s ease, transform 0.5s ease;
-    }
-    .reveal.visible {
-      opacity: 1; transform: none;
-    }
+    @media(max-width:600px){.nav-links{display:none}}
   </style>
 </head>
 <body>
 
-<!-- ===== NAV ===== -->
+<!-- NAV -->
 <nav>
-  <div class="nav-brand">☕ Java OOP – Modul 4</div>
+  <div class="nav-logo">☕ Java OOP – Modul 4</div>
   <ul class="nav-links">
-    <li><a href="#begriffe">Begriffe</a></li>
-    <li><a href="#ha1">HA 1: Tiere</a></li>
-    <li><a href="#ha2">HA 2: IT-Geräte</a></li>
-    <li><a href="#ha3">HA 3: Array</a></li>
+    <li><a href="#grundlagen">Grundlagen</a></li>
+    <li><a href="#ha1">HA 1</a></li>
+    <li><a href="#ha2">HA 2</a></li>
+    <li><a href="#ha3">HA 3</a></li>
     <li><a href="#za1">ZA 1</a></li>
     <li><a href="#za2">ZA 2</a></li>
     <li><a href="#za3">ZA 3</a></li>
     <li><a href="#za4">ZA 4</a></li>
+    <li><a href="#zusammenfassung">Zusammenfassung</a></li>
   </ul>
 </nav>
 
-<!-- ===== HERO ===== -->
-<section class="hero">
-  <div class="hero-badge">📘 Java OOP · Modul 4</div>
-  <h1>Polymorphie –<br/><span>gleicher Aufruf, anderes Verhalten</span></h1>
+<!-- HERO -->
+<div class="hero">
+  <div class="badge">📘 Java OOP · Modul 4 · Vollständige Lösung</div>
+  <h1>Polymorphie –<br/><em>gleicher Aufruf, anderes Verhalten</em></h1>
   <p class="hero-sub">
-    Schritt-für-Schritt-Erklärung aller Aufgaben mit vollständigem Code,
-    Konzepterklärungen und Beispielausgaben.
+    Jede Aufgabe mit vollständiger Schritt-für-Schritt-Anleitung,
+    ausführlichen Erklärungen zu jedem Konzept, Analogien aus dem Alltag
+    und der vollständigen Lösung.
   </p>
-  <div class="hero-cards">
-    <div class="hero-card"><span class="dot dot-blue"></span> 3 Hauptaufgaben</div>
-    <div class="hero-card"><span class="dot dot-purple"></span> 4 Zusatzaufgaben</div>
-    <div class="hero-card"><span class="dot dot-green"></span> 13 Java-Dateien</div>
-    <div class="hero-card"><span class="dot dot-orange"></span> Vollständige Lösung</div>
+  <div class="hero-pills">
+    <div class="pill"><span class="pill-dot" style="background:var(--blue)"></span>3 Hauptaufgaben</div>
+    <div class="pill"><span class="pill-dot" style="background:var(--purple)"></span>4 Zusatzaufgaben</div>
+    <div class="pill"><span class="pill-dot" style="background:var(--green)"></span>13 Java-Dateien</div>
+    <div class="pill"><span class="pill-dot" style="background:var(--orange)"></span>Alle Konzepte erklärt</div>
+    <div class="pill"><span class="pill-dot" style="background:var(--pink)"></span>Schritt für Schritt</div>
   </div>
-  <div class="scroll-hint">
-    <span>↓</span>
-    <span>Nach unten scrollen</span>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- GRUNDLAGEN -->
+<!-- ══════════════════════════════════════════════ -->
+<section id="grundlagen">
+<div class="wrap">
+
+  <div class="rv">
+    <div class="sec-label c-blue">Grundlagen &amp; Konzepte</div>
+    <h2 class="sec-title">Was musst du wissen?</h2>
+    <p class="sec-desc">
+      Bevor du die Aufgaben löst, erklärt dieser Abschnitt alle Konzepte ausführlich –
+      mit Analogien aus dem Alltag, damit du wirklich verstehst was im Code passiert.
+    </p>
   </div>
-</section>
 
-<!-- ===== SECTION: BEGRIFFE ===== -->
-<section id="begriffe">
-  <div class="container">
-
-    <div class="reveal">
-      <div class="section-label c-blue">Grundlagen</div>
-      <h2 class="section-title">Was ist Polymorphie?</h2>
-      <p class="section-desc">
-        Polymorphie bedeutet: <strong>gleicher Methodenaufruf, aber unterschiedliches Verhalten</strong>,
-        je nachdem welches Objekt tatsächlich dahintersteckt. Das ist eines der mächtigsten Konzepte
-        in der objektorientierten Programmierung.
-      </p>
+  <!-- Inhaltsverzeichnis -->
+  <div class="rv toc">
+    <div class="toc-title">📋 Inhaltsverzeichnis</div>
+    <div class="toc-grid">
+      <a class="toc-item" href="#grundlagen"><span class="toc-num">0</span> Grundlagen &amp; Konzepte</a>
+      <a class="toc-item" href="#ha1"><span class="toc-num">1</span> HA 1: Tiere</a>
+      <a class="toc-item" href="#ha2"><span class="toc-num">2</span> HA 2: IT-Geräte</a>
+      <a class="toc-item" href="#ha3"><span class="toc-num">3</span> HA 3: Array &amp; Schleife</a>
+      <a class="toc-item" href="#za1"><span class="toc-num">4</span> ZA 1: Methoden-Parameter</a>
+      <a class="toc-item" href="#za2"><span class="toc-num">5</span> ZA 2: instanceof &amp; Casting</a>
+      <a class="toc-item" href="#za3"><span class="toc-num">6</span> ZA 3: Abstrakte Klassen</a>
+      <a class="toc-item" href="#za4"><span class="toc-num">7</span> ZA 4: Ticketsystem</a>
+      <a class="toc-item" href="#zusammenfassung"><span class="toc-num">★</span> Zusammenfassung</a>
     </div>
+  </div>
 
-    <div class="reveal">
-      <div class="concept blue">
-        <div class="concept-header">
-          <div class="concept-icon bg-blue">🎯</div>
-          <div class="concept-title">Das Kernprinzip kurz erklärt</div>
-        </div>
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-dots"><div class="code-dot cd-red"></div><div class="code-dot cd-yellow"></div><div class="code-dot cd-green"></div></div>
-            <div class="code-lang">Java</div>
-          </div>
-          <pre><code><span class="cm">// Beide Variablen haben den Typ Geraet (statischer Typ)</span>
-<span class="cls">Geraet</span> geraet1 = <span class="kw">new</span> <span class="cls">Laptop</span>(...);   <span class="cm">// dynamischer Typ: Laptop</span>
-<span class="cls">Geraet</span> geraet2 = <span class="kw">new</span> <span class="cls">Drucker</span>(...);  <span class="cm">// dynamischer Typ: Drucker</span>
+  <!-- Analogie -->
+  <div class="rv">
+    <div class="analogy">
+      <div class="analogy-title">🎭 Alltagsbeispiel: Was ist Polymorphie überhaupt?</div>
+      <p>Stell dir vor, du rufst alle Mitarbeiter eines Büros an und sagst: <strong>"Bitte unterschreibt das Dokument!"</strong> Der Aufruf ist für alle gleich. Aber jeder unterschreibt <em>anders</em> – mit seinem eigenen Namen. Das ist Polymorphie: gleicher Befehl, unterschiedliches Ergebnis je nach Person (Objekt).</p>
+      <p>In Java: Du rufst bei verschiedenen Objekten dieselbe Methode auf (<code class="ic">datenAusgeben()</code>), aber jedes Objekt reagiert mit seiner eigenen Version davon.</p>
+    </div>
+  </div>
 
-<span class="cm">// Gleicher Aufruf:</span>
-geraet1.<span class="fn">datenAusgeben</span>();   <span class="cm">// → führt Laptop-Version aus!</span>
-geraet2.<span class="fn">datenAusgeben</span>();   <span class="cm">// → führt Drucker-Version aus!</span></code></pre>
-        </div>
-        <p>Java schaut zur <strong>Laufzeit</strong> auf das tatsächliche Objekt (was bei <code style="color:var(--accent-blue)">new</code> steht) und ruft die richtige Methode auf – nicht die Version der Oberklasse.</p>
+  <!-- 1: Vererbung -->
+  <div class="rv">
+    <div class="ccard blue">
+      <div class="ccard-head">
+        <div class="ccard-icon" style="background:#58a6ff20">🧬</div>
+        <div class="ccard-title">Konzept 1: Vererbung mit <code class="ic">extends</code></div>
       </div>
-    </div>
+      <p><strong>Was bedeutet das?</strong> Mit <code class="ic">extends</code> sagt eine Klasse: "Ich bin ein Spezialfall von einer anderen Klasse." Die Unterklasse erbt automatisch alle Attribute und Methoden der Oberklasse.</p>
+      <p><strong>Analogie:</strong> Ein Laptop <em>ist ein</em> Gerät. Ein Hund <em>ist ein</em> Tier. Die Oberklasse ist der allgemeine Begriff, die Unterklasse ist der spezifische.</p>
+      <div class="code-wrap">
+        <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">Vererbung – Grundprinzip</div></div>
+        <pre><code><span class="cm">// Oberklasse = der allgemeine Bauplan</span>
+<span class="kw">public class</span> <span class="cls">Tier</span> {
+    <span class="kw">public void</span> <span class="fn">geraeuschMachen</span>() {
+        System.out.<span class="fn">println</span>(<span class="str">"Das Tier macht ein Geräusch."</span>);
+    }
+}
 
-    <div class="reveal">
-      <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">📖 Schlüsselbegriffe auf einen Blick</h3>
-      <div class="ref-grid">
-        <div class="ref-item">
-          <div class="ref-keyword" style="color:var(--accent-red)">extends</div>
-          <div class="ref-desc">Klasse erbt von einer anderen.<br/><code style="color:var(--accent-blue);font-size:0.78rem">class Hund extends Tier</code></div>
-        </div>
-        <div class="ref-item">
-          <div class="ref-keyword" style="color:var(--accent-orange)">super(...)</div>
-          <div class="ref-desc">Konstruktor der Oberklasse aufrufen.<br/>Muss als erstes im Konstruktor stehen!</div>
-        </div>
-        <div class="ref-item">
-          <div class="ref-keyword" style="color:var(--accent-orange)">super.methode()</div>
-          <div class="ref-desc">Methode der Oberklasse aufrufen, z.B. <code style="color:var(--accent-blue);font-size:0.78rem">super.datenAusgeben()</code></div>
-        </div>
-        <div class="ref-item">
-          <div class="ref-keyword" style="color:var(--accent-purple)">@Override</div>
-          <div class="ref-desc">Markiert, dass diese Methode eine aus der Oberklasse überschreibt.</div>
-        </div>
-        <div class="ref-item">
-          <div class="ref-keyword" style="color:var(--accent-blue)">Statischer Typ</div>
-          <div class="ref-desc">Steht <em>links</em> bei der Variable.<br/><code style="color:var(--accent-blue);font-size:0.78rem">Geraet g = ...</code></div>
-        </div>
-        <div class="ref-item">
-          <div class="ref-keyword" style="color:var(--accent-green)">Dynamischer Typ</div>
-          <div class="ref-desc">Steht <em>rechts</em> bei new.<br/><code style="color:var(--accent-blue);font-size:0.78rem">... = new Laptop(...)</code></div>
-        </div>
-        <div class="ref-item">
-          <div class="ref-keyword" style="color:var(--accent-red)">abstract</div>
-          <div class="ref-desc">Klasse/Methode ohne Implementierung. Kein <code>new Klasse()</code> möglich!</div>
-        </div>
-        <div class="ref-item">
-          <div class="ref-keyword" style="color:var(--accent-pink)">instanceof</div>
-          <div class="ref-desc">Prüft den tatsächlichen Typ eines Objekts zur Laufzeit.</div>
-        </div>
+<span class="cm">// Unterklasse = erbte alles von Tier, ist aber spezieller</span>
+<span class="kw">public class</span> <span class="cls">Hund</span> <span class="kw">extends</span> <span class="cls">Tier</span> {  <span class="cm">// ← "Hund IST EIN Tier"</span>
+    <span class="cm">// Hund hat automatisch geraeuschMachen() geerbt!</span>
+    <span class="cm">// Wir können sie überschreiben (oder auch nicht)</span>
+}</code></pre>
       </div>
-    </div>
-
-    <div class="reveal">
       <div class="callout info">
         <span class="callout-icon">💡</span>
         <div class="callout-body">
-          <strong>Statisch vs. Dynamisch – so merkst du es dir</strong>
-          <p>Statisch = was der <em>Compiler</em> sieht (links). Dynamisch = was zur <em>Laufzeit</em> wirklich da ist (rechts bei new). Java entscheidet nach dem dynamischen Typ, welche Methode ausgeführt wird!</p>
+          <strong>Merksatz</strong>
+          <p>Immer wenn du sagen kannst "X <em>ist ein</em> Y", dann macht Vererbung Sinn. Laptop ist ein Gerät ✅ · Drucker ist ein Gerät ✅ · Gerät ist ein Laptop ❌</p>
         </div>
       </div>
     </div>
   </div>
-</section>
 
-<div class="divider"></div>
+  <!-- 2: Override -->
+  <div class="rv">
+    <div class="ccard purple">
+      <div class="ccard-head">
+        <div class="ccard-icon" style="background:#bc8cff20">🔧</div>
+        <div class="ccard-title">Konzept 2: Methoden überschreiben mit <code class="ic">@Override</code></div>
+      </div>
+      <p><strong>Was bedeutet das?</strong> Mit <code class="ic">@Override</code> sagst du Java: "Diese Methode existiert schon in der Oberklasse, aber ich möchte für meine Klasse ein anderes Verhalten definieren." Die Methode bekommt denselben Namen, aber einen neuen Rumpf (neue Anweisungen).</p>
+      <p><strong>Warum schreibt man @Override dazu?</strong> Eigentlich ist @Override optional, aber es ist sehr sinnvoll! Wenn du den Methodennamen falsch schreibst (z.B. <code class="ic">geraeuschMache</code> statt <code class="ic">geraeuschMachen</code>), bekommst du ohne @Override keinen Fehler – du denkst du überschreibst, aber du erstellst eine neue Methode. Mit @Override sagt Java sofort: "Fehler!"</p>
+      <div class="code-wrap">
+        <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">@Override in Aktion</div></div>
+        <pre><code><span class="kw">public class</span> <span class="cls">Hund</span> <span class="kw">extends</span> <span class="cls">Tier</span> {
 
-<!-- ===== HAUPTAUFGABE 1 ===== -->
-<section id="ha1">
-  <div class="container">
-
-    <div class="reveal">
-      <div class="section-label c-green">Hauptaufgabe 1</div>
-      <h2 class="section-title">Tiere – einfache Polymorphie</h2>
-      <p class="section-desc">
-        Wir starten mit einem einfachen Beispiel: Es gibt eine Oberklasse <strong>Tier</strong>
-        und drei Unterklassen. Jede Unterklasse überschreibt dieselbe Methode mit ihrer eigenen Ausgabe.
-      </p>
-    </div>
-
-    <div class="reveal">
-      <div class="tree">
-        <div class="tree-root">Tier</div>
-        <div class="tree-child"><span>Hund</span> → "Der Hund bellt."</div>
-        <div class="tree-child"><span>Katze</span> → "Die Katze miaut."</div>
-        <div class="tree-child last"><span>Kuh</span> → "Die Kuh muht."</div>
+    <span class="hl"><span class="an">@Override</span>  <span class="cm">// ← sagt Java: "Ich überschreibe eine Methode aus Tier"</span></span>
+    <span class="kw">public void</span> <span class="fn">geraeuschMachen</span>() {
+        <span class="cm">// Jetzt kommt unser NEUES Verhalten:</span>
+        System.out.<span class="fn">println</span>(<span class="str">"Der Hund bellt."</span>);
+        <span class="cm">// Die Version aus Tier ("Das Tier macht...") wird NICHT aufgerufen!</span>
+    }
+}</code></pre>
       </div>
     </div>
+  </div>
 
-    <div class="steps reveal">
+  <!-- 3: super -->
+  <div class="rv">
+    <div class="ccard green">
+      <div class="ccard-head">
+        <div class="ccard-icon" style="background:#3fb95020">⬆️</div>
+        <div class="ccard-title">Konzept 3: <code class="ic">super()</code> und <code class="ic">super.methode()</code></div>
+      </div>
+      <p><strong>super(...) im Konstruktor:</strong> Wenn eine Unterklasse einen Konstruktor hat, muss sie den Konstruktor der Oberklasse aufrufen – mit <code class="ic">super(...)</code>. Das <em>muss</em> die erste Zeile des Konstruktors sein. Es ist quasi wie: "Erst mach alles was Geraet beim Erstellen macht, dann mache ich meinen Laptop-spezifischen Teil."</p>
+      <p><strong>super.methode() in einer Methode:</strong> Du kannst von der überschriebenen Methode aus trotzdem die Version der Oberklasse aufrufen. Das ist nützlich, wenn du die Basis-Ausgabe willst und nur etwas ergänzen möchtest.</p>
+      <div class="code-wrap">
+        <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">super() und super.methode()</div></div>
+        <pre><code><span class="kw">public class</span> <span class="cls">Laptop</span> <span class="kw">extends</span> <span class="cls">Geraet</span> {
 
-      <!-- SCHRITT 1 -->
-      <div class="step open">
-        <div class="step-header" onclick="toggleStep(this)">
-          <div class="step-num" style="background:#3fb95025;color:var(--accent-green)">1</div>
-          <div class="step-info">
-            <div class="step-name">Tier.java – Die Oberklasse</div>
-            <div class="step-hint">Basisklasse mit der Methode geraeuschMachen()</div>
-          </div>
-          <div class="step-toggle">▼</div>
+    <span class="kw">private int</span> ramGb;
+
+    <span class="kw">public</span> <span class="cls">Laptop</span>(<span class="tp">String</span> inv, <span class="tp">String</span> hersteller, <span class="tp">String</span> modell,
+                   <span class="tp">String</span> standort, <span class="tp">String</span> status, <span class="kw">int</span> ramGb) {
+<span class="hl-orange">        <span class="fn">super</span>(inv, hersteller, modell, standort, status); <span class="cm">// ← MUSS erste Zeile sein!</span></span>
+        <span class="cm">// ↑ Ruft Geraet(...) auf → befüllt inventarnummer, hersteller usw.</span>
+        <span class="kw">this</span>.ramGb = ramGb; <span class="cm">// ← nur der Laptop-eigene Wert kommt hier dazu</span>
+    }
+
+    <span class="an">@Override</span>
+    <span class="kw">public void</span> <span class="fn">datenAusgeben</span>() {
+<span class="hl-green">        <span class="kw">super</span>.<span class="fn">datenAusgeben</span>(); <span class="cm">// ← ruft Geraet.datenAusgeben() auf</span></span>
+        <span class="cm">// ↑ Gibt Inventarnummer, Hersteller, Modell, Standort, Status aus</span>
+        System.out.<span class="fn">println</span>(<span class="str">"RAM: "</span> + ramGb + <span class="str">" GB"</span>); <span class="cm">// ← danach der Laptop-Teil</span>
+    }
+}</code></pre>
+      </div>
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <strong>Warum kann Laptop nicht direkt auf inventarnummer zugreifen?</strong>
+          <p>Die Attribute in Geraet sind <code class="ic">private</code>. Das bedeutet: Nur Geraet selbst darf direkt darauf zugreifen. Laptop <em>erbt</em> die Attribute, kann sie aber nicht direkt lesen. Deshalb rufen wir <code class="ic">super.datenAusgeben()</code> auf – das erledigt Geraet für uns.</p>
         </div>
-        <div class="step-body">
-          <p>Die Klasse <code style="color:var(--accent-orange)">Tier</code> ist die <strong>Oberklasse</strong> (auch Basisklasse oder Superklasse genannt). Sie enthält die Methode <code style="color:var(--accent-purple)">geraeuschMachen()</code> mit einer allgemeinen Ausgabe. Diese Methode werden die Unterklassen später <em>überschreiben</em>.</p>
-          <div class="code-block">
-            <div class="code-header">
-              <div class="code-dots"><div class="code-dot cd-red"></div><div class="code-dot cd-yellow"></div><div class="code-dot cd-green"></div></div>
-              <div class="code-lang">Tier.java</div>
-            </div>
-            <pre><code><span class="kw">public class</span> <span class="cls">Tier</span> {
+      </div>
+    </div>
+  </div>
 
-    <span class="cm">// Diese Methode gibt ein allgemeines Geräusch aus.</span>
-    <span class="cm">// Die Unterklassen werden sie mit @Override überschreiben.</span>
+  <!-- 4: Statisch/Dynamisch -->
+  <div class="rv">
+    <div class="ccard orange">
+      <div class="ccard-head">
+        <div class="ccard-icon" style="background:#ffa65720">🔍</div>
+        <div class="ccard-title">Konzept 4: Statischer &amp; Dynamischer Typ</div>
+      </div>
+      <p>Das ist das Herzstück der Polymorphie! Bei dieser Zeile gibt es <em>zwei verschiedene Typen</em>:</p>
+      <div class="code-wrap">
+        <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">Zwei Typen in einer Zeile</div></div>
+        <pre><code><span class="hl-red">  <span class="cls">Geraet</span></span>  geraet1  =  <span class="hl-green">  <span class="kw">new</span> <span class="cls">Laptop</span>(...)  </span>;
+<span class="cm">    ↑                        ↑</span>
+<span class="cm">Statischer Typ          Dynamischer Typ</span>
+<span class="cm">(links, Compiler)       (rechts, Laufzeit)</span></code></pre>
+      </div>
+      <div class="grid2">
+        <div class="mc">
+          <div class="mc-title c-red">🔴 Statischer Typ = Geraet</div>
+          <p>Das ist was der <strong>Compiler</strong> sieht (bevor das Programm läuft). Er erlaubt nur Methoden aufzurufen, die in <code class="ic">Geraet</code> bekannt sind. Du kannst keine Laptop-spezifischen Methoden aufrufen, solange die Variable den Typ <code class="ic">Geraet</code> hat.</p>
+        </div>
+        <div class="mc">
+          <div class="mc-title c-green">🟢 Dynamischer Typ = Laptop</div>
+          <p>Das ist was <strong>zur Laufzeit</strong> wirklich im Speicher liegt (wenn das Programm ausgeführt wird). Java schaut auf den dynamischen Typ und entscheidet: "Welche Version von <code class="ic">datenAusgeben()</code> führe ich aus?" → Die von Laptop!</p>
+        </div>
+      </div>
+      <div class="callout info">
+        <span class="callout-icon">🎯</span>
+        <div class="callout-body">
+          <strong>Das ist Polymorphie – dynamisches Binden (Late Binding)</strong>
+          <p>Java entscheidet erst zur <em>Laufzeit</em> (nicht beim Compilieren), welche Methode aufgerufen wird. Dieser Mechanismus heißt <strong>dynamisches Binden</strong> oder <strong>Late Binding</strong>. Der statische Typ sagt: "Was darf ich aufrufen?" Der dynamische Typ sagt: "Welche Version wird ausgeführt?"</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</section>
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- HAUPTAUFGABE 1 -->
+<!-- ══════════════════════════════════════════════ -->
+<section id="ha1">
+<div class="wrap">
+
+  <div class="rv">
+    <div class="sec-label c-green">Hauptaufgabe 1</div>
+    <h2 class="sec-title">Tiere – Polymorphie mit einfachen Klassen</h2>
+    <p class="sec-desc">
+      <strong>Aufgabenstellung:</strong> Erstelle eine Oberklasse <code class="ic">Tier</code> mit der Methode <code class="ic">geraeuschMachen()</code>. Erstelle dann die Unterklassen <code class="ic">Hund</code>, <code class="ic">Katze</code> und <code class="ic">Kuh</code>, die jeweils die Methode überschreiben. In <code class="ic">Main.java</code> sollen alle Variablen den Typ <code class="ic">Tier</code> haben, aber auf Unterklassenobjekte zeigen.
+    </p>
+  </div>
+
+  <div class="rv">
+    <div class="analogy">
+      <div class="analogy-title">🐾 Die Idee hinter dieser Aufgabe</div>
+      <p>Stell dir vor, du arbeitest in einer Tierklinik. Du hast eine Methode <code class="ic">behandeln(Tier tier)</code>. Diese Methode funktioniert für <em>alle</em> Tiere – egal ob Hund, Katze oder Kuh. Du musst nicht für jedes Tier eine eigene Behandlungsmethode schreiben. Das spart Code und macht dein Programm flexibler.</p>
+    </div>
+  </div>
+
+  <div class="rv">
+    <div class="tree">
+      <div class="tr">Tier</div>
+      <div class="tc"><span>Hund</span> <small>→ "Der Hund bellt."</small></div>
+      <div class="tc"><span>Katze</span> <small>→ "Die Katze miaut."</small></div>
+      <div class="tc last"><span>Kuh</span> <small>→ "Die Kuh muht."</small></div>
+    </div>
+  </div>
+
+  <div class="steps">
+
+    <!-- Schritt 1 -->
+    <div class="step open rv">
+      <div class="step-hdr" onclick="tog(this)">
+        <div class="step-num" style="background:#3fb95022;color:var(--green)">1</div>
+        <div class="step-info">
+          <div class="step-name">Tier.java erstellen – Die Oberklasse</div>
+          <div class="step-hint">Neue Java-Datei anlegen &amp; Methode schreiben</div>
+        </div>
+        <div class="step-arr">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="howto">
+          <div class="howto-title">📋 Schritt-für-Schritt: So löst du das</div>
+          <ol>
+            <li>Rechtsklick auf den <strong>src-Ordner</strong> im Package Explorer → <strong>New</strong> → <strong>Class</strong></li>
+            <li>Name: <code>Tier</code> eingeben → <strong>Finish</strong></li>
+            <li>Schreibe die Methode <code>geraeuschMachen()</code> in die Klasse</li>
+            <li>Die Methode ist <code>public void</code> – sie gibt nichts zurück und ist von außen aufrufbar</li>
+            <li>Speichern: <code>Strg + S</code></li>
+          </ol>
+        </div>
+        <p>Die Klasse <code class="ic">Tier</code> ist die <strong>Oberklasse</strong> (auch: Basisklasse, Superklasse). Sie enthält nur das Allgemeine – ein Tier macht <em>irgendein</em> Geräusch. Die Unterklassen werden später definieren, welches Geräusch genau.</p>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">Tier.java</div></div>
+          <pre><code><span class="cm">/**
+ * Tier ist die Oberklasse – der allgemeine Bauplan.
+ * Sie definiert: JEDES Tier kann ein Geräusch machen.
+ * WAS für ein Geräusch, bestimmt die jeweilige Unterklasse.
+ */</span>
+<span class="kw">public class</span> <span class="cls">Tier</span> {
+
+    <span class="cm">/**
+     * Diese Methode gibt ein allgemeines Geräusch aus.
+     * Sie wird von Hund, Katze und Kuh mit @Override
+     * mit einem spezifischen Geräusch überschrieben.
+     */</span>
     <span class="kw">public void</span> <span class="fn">geraeuschMachen</span>() {
         System.out.<span class="fn">println</span>(<span class="str">"Das Tier macht ein Geräusch."</span>);
     }
 }</code></pre>
-          </div>
-          <div class="callout info">
-            <span class="callout-icon">📌</span>
-            <div class="callout-body">
-              <strong>Was passiert hier?</strong>
-              <p>Tier hat eine ganz normale Methode. Wenn wir direkt <code>new Tier()</code> machen und <code>geraeuschMachen()</code> aufrufen, kommt "Das Tier macht ein Geräusch." Aber die Unterklassen können das ändern!</p>
-            </div>
+        </div>
+        <div class="callout info">
+          <span class="callout-icon">💡</span>
+          <div class="callout-body">
+            <strong>Warum hat Tier keine Attribute?</strong>
+            <p>In dieser Aufgabe brauchen wir keine Eigenschaften wie Name oder Alter. Tier hat nur die Methode. Das ist vollkommen gültig! Klassen können auch nur aus Methoden bestehen.</p>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- SCHRITT 2 -->
-      <div class="step">
-        <div class="step-header" onclick="toggleStep(this)">
-          <div class="step-num" style="background:#3fb95025;color:var(--accent-green)">2</div>
-          <div class="step-info">
-            <div class="step-name">Hund.java – Erste Unterklasse</div>
-            <div class="step-hint">extends Tier + @Override</div>
-          </div>
-          <div class="step-toggle">▼</div>
+    <!-- Schritt 2 -->
+    <div class="step rv">
+      <div class="step-hdr" onclick="tog(this)">
+        <div class="step-num" style="background:#3fb95022;color:var(--green)">2</div>
+        <div class="step-info">
+          <div class="step-name">Hund.java erstellen – Erste Unterklasse</div>
+          <div class="step-hint">extends + @Override – Methode überschreiben</div>
         </div>
-        <div class="step-body">
-          <p>Mit <code style="color:var(--accent-red)">extends Tier</code> sagt man: "Hund <em>ist ein</em> Tier". Hund erbt automatisch alle Methoden von Tier. Mit <code style="color:var(--accent-purple)">@Override</code> wird die Methode <em>überschrieben</em> – der Hund bellt jetzt statt das allgemeine Tiergeräusch zu machen.</p>
-          <div class="code-block">
-            <div class="code-header">
-              <div class="code-dots"><div class="code-dot cd-red"></div><div class="code-dot cd-yellow"></div><div class="code-dot cd-green"></div></div>
-              <div class="code-lang">Hund.java</div>
-            </div>
-            <pre><code><span class="kw">public class</span> <span class="cls">Hund</span> <span class="kw">extends</span> <span class="cls">Tier</span> {  <span class="cm">// Hund IST ein Tier</span>
+        <div class="step-arr">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="howto">
+          <div class="howto-title">📋 Schritt-für-Schritt: So löst du das</div>
+          <ol>
+            <li>Neue Klasse <code>Hund</code> erstellen (Rechtsklick → New → Class)</li>
+            <li>Im Dialog bei <strong>"Superclass"</strong> kannst du <code>Tier</code> eintragen – oder du schreibst es manuell als <code>extends Tier</code></li>
+            <li>Eclipse zeigt ggf. einen roten Strich, wenn du <code>@Override</code> hinzufügst – das verschwindet sobald du die Methode korrekt schreibst</li>
+            <li>Schreibe <code>@Override</code> in die Zeile über die Methode</li>
+            <li>Schreibe den Methodenrumpf mit der richtigen Ausgabe</li>
+          </ol>
+        </div>
+        <p>Mit <code class="ic">extends Tier</code> sagt die Klasse Hund: <em>"Ich bin ein Tier – ich erbe alles von Tier."</em> Der Hund bekommt automatisch die Methode <code class="ic">geraeuschMachen()</code>. Mit <code class="ic">@Override</code> sagt der Hund dann: <em>"Aber ich führe diese Methode auf meine eigene Art aus."</em></p>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">Hund.java</div></div>
+          <pre><code><span class="cm">/**
+ * Hund ERBT von Tier (extends Tier).
+ * Das bedeutet: Hund IST EIN Tier.
+ * Hund hat automatisch die Methode geraeuschMachen() geerbt –
+ * überschreibt sie aber mit dem Bellen.
+ */</span>
+<span class="kw">public class</span> <span class="cls">Hund</span> <span class="kw">extends</span> <span class="cls">Tier</span> {
 
-    <span class="an">@Override</span>  <span class="cm">// Diese Methode existiert schon in Tier – wir überschreiben sie</span>
+    <span class="an">@Override</span>  <span class="cm">// ← Markiert: Diese Methode kommt aus der Oberklasse Tier</span>
     <span class="kw">public void</span> <span class="fn">geraeuschMachen</span>() {
+        <span class="cm">// Nicht mehr "Das Tier macht ein Geräusch." –</span>
+        <span class="cm">// jetzt kommt das Hunde-spezifische Verhalten:</span>
         System.out.<span class="fn">println</span>(<span class="str">"Der Hund bellt."</span>);
-        <span class="cm">// NICHT mehr "Das Tier macht ein Geräusch."!</span>
     }
 }</code></pre>
-          </div>
-          <p>Katze und Kuh werden genau gleich aufgebaut:</p>
-          <div class="code-block">
-            <div class="code-header">
-              <div class="code-dots"><div class="code-dot cd-red"></div><div class="code-dot cd-yellow"></div><div class="code-dot cd-green"></div></div>
-              <div class="code-lang">Katze.java &amp; Kuh.java</div>
-            </div>
-            <pre><code><span class="kw">public class</span> <span class="cls">Katze</span> <span class="kw">extends</span> <span class="cls">Tier</span> {
+        </div>
+        <p>Katze und Kuh werden <strong>exakt gleich aufgebaut</strong> – nur der Klassenname und die Ausgabe ändern sich:</p>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">Katze.java</div></div>
+          <pre><code><span class="kw">public class</span> <span class="cls">Katze</span> <span class="kw">extends</span> <span class="cls">Tier</span> {
+
     <span class="an">@Override</span>
     <span class="kw">public void</span> <span class="fn">geraeuschMachen</span>() {
         System.out.<span class="fn">println</span>(<span class="str">"Die Katze miaut."</span>);
     }
-}
+}</code></pre>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">Kuh.java</div></div>
+          <pre><code><span class="kw">public class</span> <span class="cls">Kuh</span> <span class="kw">extends</span> <span class="cls">Tier</span> {
 
-<span class="kw">public class</span> <span class="cls">Kuh</span> <span class="kw">extends</span> <span class="cls">Tier</span> {
     <span class="an">@Override</span>
     <span class="kw">public void</span> <span class="fn">geraeuschMachen</span>() {
         System.out.<span class="fn">println</span>(<span class="str">"Die Kuh muht."</span>);
     }
 }</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Schritt 3 -->
+    <div class="step rv">
+      <div class="step-hdr" onclick="tog(this)">
+        <div class="step-num" style="background:#3fb95022;color:var(--green)">3</div>
+        <div class="step-info">
+          <div class="step-name">Main.java – Polymorphie in Aktion</div>
+          <div class="step-hint">Variablen vom Typ Tier, aber Unterklassen-Objekte</div>
+        </div>
+        <div class="step-arr">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="howto">
+          <div class="howto-title">📋 Schritt-für-Schritt: So löst du das</div>
+          <ol>
+            <li>In <code>Main.java</code> in der <code>main()</code>-Methode: Erstelle drei Variablen</li>
+            <li>Der Typ links muss <code>Tier</code> sein (nicht Hund, nicht Katze!)</li>
+            <li>Rechts bei <code>new</code> steht der konkrete Typ (Hund, Katze, Kuh)</li>
+            <li>Rufe auf jeder Variable <code>geraeuschMachen()</code> auf</li>
+            <li>Beobachte: obwohl alle Variablen Typ <code>Tier</code> haben, gibt jede etwas anderes aus</li>
+            <li>Schreibe den Kommentar mit der Erklärung (Schritt 6 der Aufgabe)</li>
+          </ol>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">Main.java – Hauptaufgabe 1</div></div>
+          <pre><code><span class="kw">public class</span> <span class="cls">Main</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="tp">String</span>[] args) {
+
+        <span class="cm">// Statischer Typ: Tier  ← steht LINKS bei der Variable</span>
+        <span class="cm">// Dynamischer Typ: Hund ← steht RECHTS bei new</span>
+<span class="hl">        <span class="cls">Tier</span> tier1 = <span class="kw">new</span> <span class="cls">Hund</span>();</span>
+<span class="hl">        <span class="cls">Tier</span> tier2 = <span class="kw">new</span> <span class="cls">Katze</span>();</span>
+<span class="hl">        <span class="cls">Tier</span> tier3 = <span class="kw">new</span> <span class="cls">Kuh</span>();</span>
+
+        <span class="cm">// GLEICHER AUFRUF – aber Java schaut: Was ist tier1 tatsächlich?</span>
+        <span class="cm">// tier1 ist ein Hund → also: Hund.geraeuschMachen() → "Der Hund bellt."</span>
+        tier1.<span class="fn">geraeuschMachen</span>();
+
+        <span class="cm">// tier2 ist eine Katze → Katze.geraeuschMachen() → "Die Katze miaut."</span>
+        tier2.<span class="fn">geraeuschMachen</span>();
+
+        <span class="cm">// tier3 ist eine Kuh → Kuh.geraeuschMachen() → "Die Kuh muht."</span>
+        tier3.<span class="fn">geraeuschMachen</span>();
+
+        <span class="cm">// ── ERKLÄRUNG (Schritt 6) ──────────────────────────────────────────</span>
+        <span class="cm">// Alle Variablen haben den Typ Tier (statischer Typ).</span>
+        <span class="cm">// Tatsächlich sind es aber Hund, Katze und Kuh (dynamischer Typ).</span>
+        <span class="cm">// Java entscheidet ERST ZUR LAUFZEIT, welche Methode aufgerufen wird.</span>
+        <span class="cm">// Das nennt man "dynamisches Binden" – und genau das ist Polymorphie!</span>
+    }
+}</code></pre>
+        </div>
+        <div class="output">
+          <div class="output-lbl">🖥️ Ausgabe in Eclipse (Console)</div>
+          Der Hund bellt.<br/>
+          Die Katze miaut.<br/>
+          Die Kuh muht.
+        </div>
+        <div class="callout tip">
+          <span class="callout-icon">✅</span>
+          <div class="callout-body">
+            <strong>Warum ist das Polymorphie?</strong>
+            <p>Der Methodenaufruf <code class="ic">geraeuschMachen()</code> ist bei allen drei Variablen <em>identisch</em>. Java schaut aber zur Laufzeit: "Was steckt wirklich in der Variable?" und ruft die richtige überschriebene Methode auf. Gleicher Code – verschiedene Ergebnisse je nach Objekt. Das ist Polymorphie.</p>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- SCHRITT 3 -->
-      <div class="step">
-        <div class="step-header" onclick="toggleStep(this)">
-          <div class="step-num" style="background:#3fb95025;color:var(--accent-green)">3</div>
-          <div class="step-info">
-            <div class="step-name">Main.java – Polymorphie in Aktion</div>
-            <div class="step-hint">Alle Variablen vom Typ Tier, aber unterschiedliche Objekte</div>
-          </div>
-          <div class="step-toggle">▼</div>
-        </div>
-        <div class="step-body">
-          <p>Jetzt kommt das Herzstück: Alle Variablen haben den <strong>statischen Typ</strong> <code style="color:var(--accent-orange)">Tier</code>. Aber jede Variable zeigt auf ein anderes Objekt – und Java ruft deshalb die richtige Methode auf.</p>
-          <div class="code-block">
-            <div class="code-header">
-              <div class="code-dots"><div class="code-dot cd-red"></div><div class="code-dot cd-yellow"></div><div class="code-dot cd-green"></div></div>
-              <div class="code-lang">Main.java – Hauptaufgabe 1</div>
-            </div>
-            <pre><code><span class="cm">// Statischer Typ = Tier (links)</span>
-<span class="cm">// Dynamischer Typ = Hund / Katze / Kuh (rechts bei new)</span>
-<span class="cls">Tier</span> tier1 = <span class="kw">new</span> <span class="cls">Hund</span>();   <span class="cm">// dynamisch: Hund</span>
-<span class="cls">Tier</span> tier2 = <span class="kw">new</span> <span class="cls">Katze</span>();  <span class="cm">// dynamisch: Katze</span>
-<span class="cls">Tier</span> tier3 = <span class="kw">new</span> <span class="cls">Kuh</span>();    <span class="cm">// dynamisch: Kuh</span>
-
-tier1.<span class="fn">geraeuschMachen</span>();  <span class="cm">// Java: dynamischer Typ ist Hund → Hund.geraeuschMachen()</span>
-tier2.<span class="fn">geraeuschMachen</span>();  <span class="cm">// Java: dynamischer Typ ist Katze → Katze.geraeuschMachen()</span>
-tier3.<span class="fn">geraeuschMachen</span>();  <span class="cm">// Java: dynamischer Typ ist Kuh → Kuh.geraeuschMachen()</span>
-
-<span class="cm">// Alle Variablen haben den Typ Tier (statischer Typ).</span>
-<span class="cm">// Tatsächlich sind es Hund, Katze und Kuh (dynamischer Typ).</span>
-<span class="cm">// Java entscheidet zur Laufzeit, welche Methode aufgerufen wird → Polymorphie!</span></code></pre>
-          </div>
-          <div class="result">
-            <div class="result-label">🖥️ Ausgabe in Eclipse</div>
-            Der Hund bellt.<br/>
-            Die Katze miaut.<br/>
-            Die Kuh muht.
-          </div>
-          <div class="callout tip">
-            <span class="callout-icon">✅</span>
-            <div class="callout-body">
-              <strong>Warum ist das Polymorphie?</strong>
-              <p>Der Aufruf <code>geraeuschMachen()</code> ist bei allen drei Variablen <em>identisch</em> – aber die Ausgabe ist jeweils verschieden. Java schaut beim Aufruf auf das tatsächliche Objekt und führt die passende Version aus. Das nennt man <em>dynamisches Binden</em> (Late Binding).</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- end steps -->
-  </div>
+  </div><!-- /steps -->
+</div>
 </section>
-
 <div class="divider"></div>
 
-<!-- ===== HAUPTAUFGABE 2 ===== -->
+<!-- ══════════════════════════════════════════════ -->
+<!-- HAUPTAUFGABE 2 -->
+<!-- ══════════════════════════════════════════════ -->
 <section id="ha2">
-  <div class="container">
+<div class="wrap">
 
-    <div class="reveal">
-      <div class="section-label c-blue">Hauptaufgabe 2</div>
-      <h2 class="section-title">IT-Geräte polymorph verwalten</h2>
-      <p class="section-desc">
-        Jetzt auf ein praxisnahes IT-Beispiel: Ein Unternehmen verwaltet Laptops, Drucker und Switches.
-        Alle sind "Geräte" – aber jedes Gerät hat zusätzlich eigene Daten.
-      </p>
+  <div class="rv">
+    <div class="sec-label c-blue">Hauptaufgabe 2</div>
+    <h2 class="sec-title">IT-Geräte polymorph verwalten</h2>
+    <p class="sec-desc">
+      <strong>Aufgabenstellung:</strong> Erstelle die Klassen <code class="ic">Geraet</code>, <code class="ic">Laptop</code>, <code class="ic">Drucker</code> und <code class="ic">Switch</code>. Die Unterklassen sollen von <code class="ic">Geraet</code> erben und die Methode <code class="ic">datenAusgeben()</code> überschreiben. In Main.java sollen polymorphe Variablen verwendet werden.
+    </p>
+  </div>
+
+  <div class="rv">
+    <div class="analogy">
+      <div class="analogy-title">💼 Die Idee hinter dieser Aufgabe</div>
+      <p>In einer Firma gibt es eine IT-Inventarliste. Alle Geräte haben gemeinsame Felder: Inventarnummer, Hersteller, Modell, Standort, Status. Aber ein Laptop hat zusätzlich einen RAM-Wert, ein Drucker hat ein Druckverfahren, ein Switch hat Ports und einen Managed-Status.</p>
+      <p>Mit Vererbung und Polymorphie kannst du alle Geräte über denselben "Bauplan" (Geraet) verwalten, ohne Code doppelt zu schreiben. Die gemeinsamen Felder stehen einmal in Geraet – die spezifischen in den Unterklassen.</p>
     </div>
+  </div>
 
-    <div class="reveal">
-      <div class="tree">
-        <div class="tree-root">Geraet (inventarnummer, hersteller, modell, standort, status)</div>
-        <div class="tree-child"><span>Laptop</span> → + ramGb (int)</div>
-        <div class="tree-child"><span>Drucker</span> → + druckverfahren (String)</div>
-        <div class="tree-child last"><span>Switch</span> → + anzahlPorts (int), managed (boolean)</div>
-      </div>
+  <div class="rv">
+    <div class="tree">
+      <div class="tr">Geraet (inventarnummer, hersteller, modell, standort, status)</div>
+      <div class="tc"><span>Laptop</span> <small>+ ramGb (int)</small></div>
+      <div class="tc"><span>Drucker</span> <small>+ druckverfahren (String)</small></div>
+      <div class="tc last"><span>Switch</span> <small>+ anzahlPorts (int) + managed (boolean)</small></div>
     </div>
+  </div>
 
-    <div class="steps reveal">
+  <div class="steps">
 
-      <!-- Geraet.java -->
-      <div class="step open">
-        <div class="step-header" onclick="toggleStep(this)">
-          <div class="step-num" style="background:#58a6ff25;color:var(--accent-blue)">1</div>
-          <div class="step-info">
-            <div class="step-name">Geraet.java – Die Oberklasse mit Attributen</div>
-            <div class="step-hint">private Attribute, Konstruktor, Getter/Setter, datenAusgeben()</div>
-          </div>
-          <div class="step-toggle">▼</div>
+    <!-- Schritt 1: Geraet -->
+    <div class="step open rv">
+      <div class="step-hdr" onclick="tog(this)">
+        <div class="step-num" style="background:#58a6ff22;color:var(--blue)">1</div>
+        <div class="step-info">
+          <div class="step-name">Geraet.java – Die Oberklasse mit Attributen</div>
+          <div class="step-hint">private Attribute · Konstruktor mit this · Getter &amp; Setter · datenAusgeben()</div>
         </div>
-        <div class="step-body">
-          <p><strong>Kapselung</strong>: Die Attribute sind <code style="color:var(--accent-red)">private</code> – von außen kann man sie nicht direkt lesen oder ändern. Dafür gibt es <em>Getter</em> (<code>getStatus()</code>) und <em>Setter</em> (<code>setStatus(...)</code>).</p>
-          <div class="code-block">
-            <div class="code-header">
-              <div class="code-dots"><div class="code-dot cd-red"></div><div class="code-dot cd-yellow"></div><div class="code-dot cd-green"></div></div>
-              <div class="code-lang">Geraet.java</div>
-            </div>
-            <pre><code><span class="kw">public class</span> <span class="cls">Geraet</span> {
+        <div class="step-arr">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="howto">
+          <div class="howto-title">📋 Schritt-für-Schritt: So löst du das</div>
+          <ol>
+            <li>Neue Klasse <code>Geraet</code> erstellen</li>
+            <li>Schreibe die 5 <strong>privaten Attribute</strong> ganz oben in die Klasse (vor dem Konstruktor)</li>
+            <li>Schreibe den <strong>Konstruktor</strong>: <code>public Geraet(String inventarnummer, String hersteller, ...)</code></li>
+            <li>Im Konstruktor: Befülle jedes Attribut mit <code>this.attribut = parameter;</code></li>
+            <li>Schreibe <strong>Getter</strong> <code>getStatus()</code> und <strong>Setter</strong> <code>setStatus(String status)</code></li>
+            <li>Schreibe die Methode <code>datenAusgeben()</code> die alle 5 Attribute ausgibt</li>
+          </ol>
+        </div>
 
-    <span class="cm">// private = nur innerhalb dieser Klasse direkt zugänglich</span>
-    <span class="kw">private</span> <span class="tp">String</span> inventarnummer;
-    <span class="kw">private</span> <span class="tp">String</span> hersteller;
-    <span class="kw">private</span> <span class="tp">String</span> modell;
-    <span class="kw">private</span> <span class="tp">String</span> standort;
-    <span class="kw">private</span> <span class="tp">String</span> status;
+        <p><strong>Warum <code class="ic">private</code>?</strong> Das nennt man <em>Kapselung (Encapsulation)</em>. Die Attribute sind von außen nicht direkt änderbar. Man kann sie nur über definierte Methoden lesen (<em>Getter</em>) oder ändern (<em>Setter</em>). Das schützt die Daten vor unbeabsichtigten Änderungen.</p>
+        <p><strong>Warum <code class="ic">this.inventarnummer = inventarnummer</code>?</strong> Weil der Parameter des Konstruktors denselben Namen hat wie das Attribut. Mit <code class="ic">this.inventarnummer</code> meinst du das Attribut der Klasse; ohne <code class="ic">this</code> würde Java denken du meinst den Parameter.</p>
 
-    <span class="cm">// Konstruktor: wird aufgerufen wenn man new Geraet(...) schreibt</span>
-    <span class="cm">// "this.xyz" = Attribut dieser Klasse, "xyz" = der Parameter</span>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">Geraet.java</div></div>
+          <pre><code><span class="cm">/**
+ * Geraet ist die Oberklasse für alle IT-Geräte.
+ * Sie enthält die gemeinsamen Felder und Methoden.
+ */</span>
+<span class="kw">public class</span> <span class="cls">Geraet</span> {
+
+    <span class="cm">// ── ATTRIBUTE (private = nur innerhalb dieser Klasse direkt zugänglich) ──</span>
+    <span class="kw">private</span> <span class="tp">String</span> inventarnummer;   <span class="cm">// z.B. "IT-1001"</span>
+    <span class="kw">private</span> <span class="tp">String</span> hersteller;        <span class="cm">// z.B. "Lenovo"</span>
+    <span class="kw">private</span> <span class="tp">String</span> modell;            <span class="cm">// z.B. "ThinkPad T14"</span>
+    <span class="kw">private</span> <span class="tp">String</span> standort;          <span class="cm">// z.B. "Raum 101"</span>
+    <span class="kw">private</span> <span class="tp">String</span> status;            <span class="cm">// "aktiv" / "offline" / "wartung"</span>
+
+    <span class="cm">// ── KONSTRUKTOR ───────────────────────────────────────────────────────────</span>
+    <span class="cm">// Wird aufgerufen wenn man: new Geraet("IT-1001", "Lenovo", ...) schreibt</span>
     <span class="kw">public</span> <span class="cls">Geraet</span>(<span class="tp">String</span> inventarnummer, <span class="tp">String</span> hersteller,
                    <span class="tp">String</span> modell, <span class="tp">String</span> standort, <span class="tp">String</span> status) {
-        <span class="kw">this</span>.inventarnummer = inventarnummer;
-        <span class="kw">this</span>.hersteller = hersteller;
-        <span class="kw">this</span>.modell = modell;
-        <span class="kw">this</span>.standort = standort;
+
+        <span class="cm">// "this.inventarnummer" = das ATTRIBUT dieser Klasse</span>
+        <span class="cm">// "inventarnummer" ohne this = der PARAMETER des Konstruktors</span>
+<span class="hl">        <span class="kw">this</span>.inventarnummer = inventarnummer;</span>
+        <span class="kw">this</span>.hersteller  = hersteller;
+        <span class="kw">this</span>.modell      = modell;
+        <span class="kw">this</span>.standort    = standort;
+        <span class="kw">this</span>.status      = status;
+    }
+
+    <span class="cm">// ── GETTER & SETTER ───────────────────────────────────────────────────────</span>
+    <span class="cm">// Getter: Gibt den Wert nach außen zurück (nur lesen)</span>
+    <span class="kw">public</span> <span class="tp">String</span> <span class="fn">getStatus</span>() {
+        <span class="kw">return</span> status;
+    }
+
+    <span class="cm">// Setter: Erlaubt den Wert von außen zu ändern (kontrolliert)</span>
+    <span class="kw">public void</span> <span class="fn">setStatus</span>(<span class="tp">String</span> status) {
         <span class="kw">this</span>.status = status;
     }
 
-    <span class="cm">// Getter: gibt den Status zurück (lesbar von außen)</span>
-    <span class="kw">public</span> <span class="tp">String</span> <span class="fn">getStatus</span>() { <span class="kw">return</span> status; }
-
-    <span class="cm">// Setter: ändert den Status (schreibbar von außen)</span>
-    <span class="kw">public void</span> <span class="fn">setStatus</span>(<span class="tp">String</span> status) { <span class="kw">this</span>.status = status; }
-
-    <span class="cm">// Diese Methode wird in den Unterklassen mit @Override erweitert</span>
+    <span class="cm">// ── METHODE ──────────────────────────────────────────────────────────────</span>
+    <span class="cm">// Diese Methode wird von den Unterklassen mit @Override erweitert.</span>
+    <span class="cm">// Laptop, Drucker und Switch rufen sie mit super.datenAusgeben() auf.</span>
     <span class="kw">public void</span> <span class="fn">datenAusgeben</span>() {
         System.out.<span class="fn">println</span>(<span class="str">"Inventarnummer: "</span> + inventarnummer);
         System.out.<span class="fn">println</span>(<span class="str">"Hersteller:     "</span> + hersteller);
@@ -845,298 +833,370 @@ tier3.<span class="fn">geraeuschMachen</span>();  <span class="cm">// Java: dyna
         System.out.<span class="fn">println</span>(<span class="str">"Status:         "</span> + status);
     }
 }</code></pre>
-          </div>
         </div>
       </div>
+    </div>
 
-      <!-- Laptop.java -->
-      <div class="step">
-        <div class="step-header" onclick="toggleStep(this)">
-          <div class="step-num" style="background:#58a6ff25;color:var(--accent-blue)">2</div>
-          <div class="step-info">
-            <div class="step-name">Laptop.java – Unterklasse mit super()</div>
-            <div class="step-hint">extends Geraet, super(...), @Override datenAusgeben</div>
-          </div>
-          <div class="step-toggle">▼</div>
+    <!-- Schritt 2: Laptop -->
+    <div class="step rv">
+      <div class="step-hdr" onclick="tog(this)">
+        <div class="step-num" style="background:#58a6ff22;color:var(--blue)">2</div>
+        <div class="step-info">
+          <div class="step-name">Laptop.java – Unterklasse mit super() im Konstruktor</div>
+          <div class="step-hint">extends Geraet · super(...) · @Override · super.datenAusgeben()</div>
         </div>
-        <div class="step-body">
-          <p>Der Laptop erbt von Geraet. Im Konstruktor muss als <strong>erstes</strong> <code style="color:var(--accent-orange)">super(...)</code> aufgerufen werden – das gibt die gemeinsamen Werte an den Geraet-Konstruktor weiter. Dann speichert der Laptop nur noch seinen eigenen Wert (<code>ramGb</code>).</p>
+        <div class="step-arr">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="howto">
+          <div class="howto-title">📋 Schritt-für-Schritt: So löst du das</div>
+          <ol>
+            <li>Neue Klasse <code>Laptop</code> mit <code>extends Geraet</code> erstellen</li>
+            <li>Füge das Laptop-eigene Attribut <code>private int ramGb;</code> hinzu</li>
+            <li>Erstelle den Konstruktor: Er bekommt <em>alle</em> Geraet-Parameter <strong>plus</strong> <code>int ramGb</code></li>
+            <li>Im Konstruktor als <strong>ERSTE ZEILE</strong>: <code>super(inventarnummer, hersteller, modell, standort, status);</code></li>
+            <li>Danach: <code>this.ramGb = ramGb;</code></li>
+            <li>Überschreibe <code>datenAusgeben()</code> mit <code>@Override</code></li>
+            <li>In der Methode: Als erstes <code>super.datenAusgeben();</code>, dann RAM ausgeben</li>
+          </ol>
+        </div>
 
-          <div class="flow">
-            <div class="flow-box orange">new Laptop("IT-1001", "Lenovo", ..., 16)</div>
-            <div class="flow-arrow">→</div>
-            <div class="flow-box blue">super("IT-1001", "Lenovo", ...) in Geraet</div>
-            <div class="flow-arrow">→</div>
-            <div class="flow-box green">ramGb = 16 in Laptop</div>
-          </div>
+        <p><strong>Warum muss super(...) die erste Zeile sein?</strong> Java erzwingt das. Die Oberklasse muss zuerst komplett initialisiert werden, bevor die Unterklasse ihre eigenen Dinge erledigt. Es wäre sonst möglich, auf Attribute zuzugreifen, die noch gar nicht existieren.</p>
 
-          <div class="code-block">
-            <div class="code-header">
-              <div class="code-dots"><div class="code-dot cd-red"></div><div class="code-dot cd-yellow"></div><div class="code-dot cd-green"></div></div>
-              <div class="code-lang">Laptop.java</div>
-            </div>
-            <pre><code><span class="kw">public class</span> <span class="cls">Laptop</span> <span class="kw">extends</span> <span class="cls">Geraet</span> {
+        <div class="flow">
+          <div class="fb o">new Laptop("IT-1001", "Lenovo", ..., 16)</div>
+          <div class="fa">→</div>
+          <div class="fb b">super(...) → Geraet-Konstruktor</div>
+          <div class="fa">→</div>
+          <div class="fb g">this.ramGb = 16</div>
+          <div class="fa">→</div>
+          <div class="fb p">Laptop-Objekt fertig!</div>
+        </div>
 
-    <span class="kw">private int</span> ramGb;  <span class="cm">// nur Laptop hat dieses Attribut</span>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">Laptop.java</div></div>
+          <pre><code><span class="kw">public class</span> <span class="cls">Laptop</span> <span class="kw">extends</span> <span class="cls">Geraet</span> {   <span class="cm">// Laptop IST EIN Geraet</span>
 
+    <span class="cm">// Laptop-eigenes Attribut (zusätzlich zu den Geraet-Attributen)</span>
+    <span class="kw">private int</span> ramGb;
+
+    <span class="cm">// Konstruktor: Nimmt alle Geraet-Parameter PLUS ramGb entgegen</span>
     <span class="kw">public</span> <span class="cls">Laptop</span>(<span class="tp">String</span> inventarnummer, <span class="tp">String</span> hersteller, <span class="tp">String</span> modell,
                    <span class="tp">String</span> standort, <span class="tp">String</span> status, <span class="kw">int</span> ramGb) {
-<span class="hl">        <span class="fn">super</span>(inventarnummer, hersteller, modell, standort, status);</span>
-        <span class="cm">// ↑ Ruft den Geraet-Konstruktor auf (muss ALS ERSTES stehen!)</span>
-        <span class="kw">this</span>.ramGb = ramGb;  <span class="cm">// Laptop-eigener Wert</span>
+
+<span class="hl-orange">        <span class="fn">super</span>(inventarnummer, hersteller, modell, standort, status);</span>
+        <span class="cm">        // ↑ MUSS die erste Zeile sein! Ruft Geraet(String,String,String,String,String) auf.</span>
+        <span class="cm">        //   Der Geraet-Konstruktor befüllt: inventarnummer, hersteller, modell, standort, status</span>
+
+        <span class="kw">this</span>.ramGb = ramGb;   <span class="cm">// Nur der Laptop-eigene Wert kommt hier dazu</span>
     }
 
     <span class="an">@Override</span>
     <span class="kw">public void</span> <span class="fn">datenAusgeben</span>() {
-<span class="hl">        <span class="kw">super</span>.<span class="fn">datenAusgeben</span>();</span>
-        <span class="cm">// ↑ Ruft Geraet.datenAusgeben() auf → gibt Inventarnummer, Hersteller usw. aus</span>
+<span class="hl-green">        <span class="kw">super</span>.<span class="fn">datenAusgeben</span>();</span>
+        <span class="cm">        // ↑ Ruft Geraet.datenAusgeben() auf → gibt alle 5 Basis-Felder aus</span>
+        <span class="cm">        //   (inventarnummer, hersteller, modell, standort, status)</span>
+        <span class="cm">        //   WARUM: inventarnummer usw. sind private in Geraet –</span>
+        <span class="cm">        //   Laptop kann sie nicht direkt ansprechen!</span>
+
         System.out.<span class="fn">println</span>(<span class="str">"RAM:            "</span> + ramGb + <span class="str">" GB"</span>);
-        <span class="cm">// ↑ Danach kommt der Laptop-spezifische Teil</span>
+        <span class="cm">        // ↑ Nur der Laptop-eigene Teil wird hier ergänzt</span>
     }
 }</code></pre>
-          </div>
+        </div>
 
-          <div class="callout tip">
-            <span class="callout-icon">💡</span>
-            <div class="callout-body">
-              <strong>Warum super.datenAusgeben()?</strong>
-              <p>Die Attribute inventarnummer, hersteller usw. sind <code>private</code> in Geraet. Das Laptop-Objekt kann sie nicht direkt ansprechen! Deshalb rufen wir die Methode der Oberklasse auf, die das für uns erledigt. Dann ergänzen wir nur noch den RAM.</p>
-            </div>
-          </div>
+        <div class="output">
+          <div class="output-lbl">🖥️ Ausgabe wenn datenAusgeben() auf Laptop aufgerufen wird</div>
+          Inventarnummer: IT-1001<br/>
+          Hersteller:     Lenovo<br/>
+          Modell:         ThinkPad T14<br/>
+          Standort:       Raum 101<br/>
+          Status:         aktiv<br/>
+          RAM:            16 GB
         </div>
       </div>
+    </div>
 
-      <!-- Drucker.java -->
-      <div class="step">
-        <div class="step-header" onclick="toggleStep(this)">
-          <div class="step-num" style="background:#58a6ff25;color:var(--accent-blue)">3</div>
-          <div class="step-info">
-            <div class="step-name">Drucker.java &amp; Switch.java</div>
-            <div class="step-hint">Gleiches Muster, andere Attribute</div>
-          </div>
-          <div class="step-toggle">▼</div>
+    <!-- Schritt 3: Drucker + Switch -->
+    <div class="step rv">
+      <div class="step-hdr" onclick="tog(this)">
+        <div class="step-num" style="background:#58a6ff22;color:var(--blue)">3</div>
+        <div class="step-info">
+          <div class="step-name">Drucker.java &amp; Switch.java – Gleiches Muster, andere Attribute</div>
+          <div class="step-hint">Druckverfahren (String) · anzahlPorts (int) · managed (boolean)</div>
         </div>
-        <div class="step-body">
-          <div class="code-block">
-            <div class="code-header">
-              <div class="code-dots"><div class="code-dot cd-red"></div><div class="code-dot cd-yellow"></div><div class="code-dot cd-green"></div></div>
-              <div class="code-lang">Drucker.java</div>
-            </div>
-            <pre><code><span class="kw">public class</span> <span class="cls">Drucker</span> <span class="kw">extends</span> <span class="cls">Geraet</span> {
+        <div class="step-arr">▼</div>
+      </div>
+      <div class="step-body">
+        <p>Drucker und Switch werden <strong>exakt nach demselben Muster</strong> wie Laptop aufgebaut – nur die spezifischen Attribute unterscheiden sich. Für Switch kommt der Datentyp <code class="ic">boolean</code> hinzu.</p>
+        <div class="callout purple-c">
+          <span class="callout-icon">📌</span>
+          <div class="callout-body">
+            <strong>Was ist ein boolean?</strong>
+            <p>Ein <code class="ic">boolean</code> kann nur zwei Werte haben: <code class="ic">true</code> (wahr) oder <code class="ic">false</code> (falsch). Bei <code class="ic">managed</code>: <code class="ic">true</code> = der Switch ist konfigurierbar (managed Switch, teurer). <code class="ic">false</code> = einfacher Switch ohne Konfiguration (unmanaged).</p>
+          </div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">Drucker.java</div></div>
+          <pre><code><span class="kw">public class</span> <span class="cls">Drucker</span> <span class="kw">extends</span> <span class="cls">Geraet</span> {
 
-    <span class="kw">private</span> <span class="tp">String</span> druckverfahren;  <span class="cm">// z.B. "Laserdruck", "Tintenstrahl"</span>
+    <span class="kw">private</span> <span class="tp">String</span> druckverfahren;   <span class="cm">// "Laserdruck" / "Tintenstrahl" / "Thermodruck"</span>
 
     <span class="kw">public</span> <span class="cls">Drucker</span>(<span class="tp">String</span> inventarnummer, <span class="tp">String</span> hersteller, <span class="tp">String</span> modell,
                     <span class="tp">String</span> standort, <span class="tp">String</span> status, <span class="tp">String</span> druckverfahren) {
-        <span class="fn">super</span>(inventarnummer, hersteller, modell, standort, status);
-        <span class="kw">this</span>.druckverfahren = druckverfahren;
+        <span class="fn">super</span>(inventarnummer, hersteller, modell, standort, status); <span class="cm">// Geraet befüllen</span>
+        <span class="kw">this</span>.druckverfahren = druckverfahren;                         <span class="cm">// Drucker-eigener Wert</span>
     }
 
     <span class="an">@Override</span>
     <span class="kw">public void</span> <span class="fn">datenAusgeben</span>() {
-        <span class="kw">super</span>.<span class="fn">datenAusgeben</span>();                                           <span class="cm">// allgemein</span>
-        System.out.<span class="fn">println</span>(<span class="str">"Druckverfahren: "</span> + druckverfahren);    <span class="cm">// Drucker-spezifisch</span>
+        <span class="kw">super</span>.<span class="fn">datenAusgeben</span>();                                            <span class="cm">// Basis-Daten</span>
+        System.out.<span class="fn">println</span>(<span class="str">"Druckverfahren: "</span> + druckverfahren);       <span class="cm">// Drucker-spezifisch</span>
     }
 }</code></pre>
-          </div>
-          <div class="code-block">
-            <div class="code-header">
-              <div class="code-dots"><div class="code-dot cd-red"></div><div class="code-dot cd-yellow"></div><div class="code-dot cd-green"></div></div>
-              <div class="code-lang">Switch.java</div>
-            </div>
-            <pre><code><span class="kw">public class</span> <span class="cls">Switch</span> <span class="kw">extends</span> <span class="cls">Geraet</span> {
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">Switch.java</div></div>
+          <pre><code><span class="kw">public class</span> <span class="cls">Switch</span> <span class="kw">extends</span> <span class="cls">Geraet</span> {
 
-    <span class="kw">private int</span>     anzahlPorts;  <span class="cm">// z.B. 8, 24, 48</span>
-    <span class="kw">private boolean</span> managed;      <span class="cm">// true = konfigurierbar, false = einfacher Switch</span>
+    <span class="kw">private int</span>     anzahlPorts;   <span class="cm">// z.B. 8, 24, 48</span>
+    <span class="kw">private boolean</span> managed;       <span class="cm">// true = managed (konfigurierbar) / false = unmanaged</span>
 
     <span class="kw">public</span> <span class="cls">Switch</span>(<span class="tp">String</span> inventarnummer, <span class="tp">String</span> hersteller, <span class="tp">String</span> modell,
                    <span class="tp">String</span> standort, <span class="tp">String</span> status, <span class="kw">int</span> anzahlPorts, <span class="kw">boolean</span> managed) {
         <span class="fn">super</span>(inventarnummer, hersteller, modell, standort, status);
         <span class="kw">this</span>.anzahlPorts = anzahlPorts;
-        <span class="kw">this</span>.managed = managed;
+        <span class="kw">this</span>.managed     = managed;
     }
 
     <span class="an">@Override</span>
     <span class="kw">public void</span> <span class="fn">datenAusgeben</span>() {
         <span class="kw">super</span>.<span class="fn">datenAusgeben</span>();
         System.out.<span class="fn">println</span>(<span class="str">"Anzahl Ports:   "</span> + anzahlPorts);
-        <span class="cm">// Ternärer Operator: Bedingung ? "wenn true" : "wenn false"</span>
+
+        <span class="cm">// Ternärer Operator: (Bedingung) ? "wenn true" : "wenn false"</span>
+        <span class="cm">// Gibt "Ja" aus wenn managed=true, sonst "Nein"</span>
         System.out.<span class="fn">println</span>(<span class="str">"Managed:        "</span> + (managed ? <span class="str">"Ja"</span> : <span class="str">"Nein"</span>));
     }
 }</code></pre>
-          </div>
         </div>
       </div>
+    </div>
 
-      <!-- Main HA2 -->
-      <div class="step">
-        <div class="step-header" onclick="toggleStep(this)">
-          <div class="step-num" style="background:#58a6ff25;color:var(--accent-blue)">4</div>
-          <div class="step-info">
-            <div class="step-name">Main.java – Polymorphe Variablen</div>
-            <div class="step-hint">Statischer Typ Geraet, dynamisch: Laptop/Drucker/Switch</div>
-          </div>
-          <div class="step-toggle">▼</div>
+    <!-- Schritt 4: Main HA2 -->
+    <div class="step rv">
+      <div class="step-hdr" onclick="tog(this)">
+        <div class="step-num" style="background:#58a6ff22;color:var(--blue)">4</div>
+        <div class="step-info">
+          <div class="step-name">Main.java – Polymorphe Variablen + Kommentar</div>
+          <div class="step-hint">Statischer Typ Geraet · Schritt 5 &amp; 6 der Aufgabe</div>
         </div>
-        <div class="step-body">
-          <div class="code-block">
-            <div class="code-header">
-              <div class="code-dots"><div class="code-dot cd-red"></div><div class="code-dot cd-yellow"></div><div class="code-dot cd-green"></div></div>
-              <div class="code-lang">Main.java – Hauptaufgabe 2</div>
-            </div>
-            <pre><code><span class="cm">// Statischer Typ: Geraet | Dynamischer Typ: Laptop</span>
+        <div class="step-arr">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="howto">
+          <div class="howto-title">📋 Schritt-für-Schritt: So löst du das</div>
+          <ol>
+            <li>In <code>Main.java</code>: Erstelle 3 Variablen, alle mit Typ <code>Geraet</code> (statischer Typ)</li>
+            <li>Rechts bei <code>new</code>: Verwende die konkreten Klassen mit allen nötigen Parametern</li>
+            <li>Rufe auf jeder Variable <code>datenAusgeben()</code> auf (+ <code>System.out.println()</code> für Leerzeile dazwischen)</li>
+            <li>Füge den Kommentar mit Erklärung für Schritt 6 hinzu</li>
+          </ol>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">Main.java – Hauptaufgabe 2</div></div>
+          <pre><code><span class="cm">// Statischer Typ: Geraet | Dynamischer Typ: Laptop</span>
 <span class="cls">Geraet</span> geraet1 = <span class="kw">new</span> <span class="cls">Laptop</span>(
-    <span class="str">"IT-1001"</span>, <span class="str">"Lenovo"</span>, <span class="str">"ThinkPad T14"</span>, <span class="str">"Raum 101"</span>, <span class="str">"aktiv"</span>, <span class="num">16</span>
+        <span class="str">"IT-1001"</span>, <span class="str">"Lenovo"</span>, <span class="str">"ThinkPad T14"</span>, <span class="str">"Raum 101"</span>, <span class="str">"aktiv"</span>, <span class="num">16</span>
 );
 
 <span class="cls">Geraet</span> geraet2 = <span class="kw">new</span> <span class="cls">Drucker</span>(
-    <span class="str">"IT-2001"</span>, <span class="str">"HP"</span>, <span class="str">"LaserJet Pro"</span>, <span class="str">"Raum 204"</span>, <span class="str">"aktiv"</span>, <span class="str">"Laserdruck"</span>
+        <span class="str">"IT-2001"</span>, <span class="str">"HP"</span>, <span class="str">"LaserJet Pro"</span>, <span class="str">"Raum 204"</span>, <span class="str">"aktiv"</span>, <span class="str">"Laserdruck"</span>
 );
 
 <span class="cls">Geraet</span> geraet3 = <span class="kw">new</span> <span class="cls">Switch</span>(
-    <span class="str">"IT-3001"</span>, <span class="str">"Cisco"</span>, <span class="str">"CBS350"</span>, <span class="str">"Serverraum"</span>, <span class="str">"wartung"</span>, <span class="num">24</span>, <span class="kw">true</span>
+        <span class="str">"IT-3001"</span>, <span class="str">"Cisco"</span>, <span class="str">"CBS350"</span>, <span class="str">"Serverraum"</span>, <span class="str">"wartung"</span>, <span class="num">24</span>, <span class="kw">true</span>
 );
 
-<span class="cm">// Gleicher Aufruf – aber jeweils andere Ausgabe!</span>
-geraet1.<span class="fn">datenAusgeben</span>();  <span class="cm">// → Laptop-Ausgabe (inkl. RAM: 16 GB)</span>
-geraet2.<span class="fn">datenAusgeben</span>();  <span class="cm">// → Drucker-Ausgabe (inkl. Druckverfahren)</span>
-geraet3.<span class="fn">datenAusgeben</span>();  <span class="cm">// → Switch-Ausgabe (inkl. Ports + Managed)</span>
+geraet1.<span class="fn">datenAusgeben</span>();  System.out.<span class="fn">println</span>();
+geraet2.<span class="fn">datenAusgeben</span>();  System.out.<span class="fn">println</span>();
+geraet3.<span class="fn">datenAusgeben</span>();
 
-<span class="cm">// Warum wird Laptop-Ausgabe für geraet1 verwendet?</span>
-<span class="cm">// → geraet1 wurde mit new Laptop(...) erstellt → dynamischer Typ ist Laptop</span>
-<span class="cm">// → Java ruft Laptop.datenAusgeben() auf, nicht Geraet.datenAusgeben()</span></code></pre>
-          </div>
-          <div class="result">
-            <div class="result-label">🖥️ Ausgabe für geraet1 (Laptop)</div>
-            Inventarnummer: IT-1001<br/>
-            Hersteller:     Lenovo<br/>
-            Modell:         ThinkPad T14<br/>
-            Standort:       Raum 101<br/>
-            Status:         aktiv<br/>
-            RAM:            16 GB
-          </div>
+<span class="cm">// ── ERKLÄRUNG (Schritt 6) ──────────────────────────────────────────────────</span>
+<span class="cm">// Warum wird bei geraet1 die Laptop-Ausgabe verwendet?</span>
+<span class="cm">//   → geraet1 wurde mit "new Laptop(...)" erstellt → dynamischer Typ: Laptop</span>
+<span class="cm">//   → Java führt zur Laufzeit Laptop.datenAusgeben() aus (nicht Geraet-Version)</span>
+<span class="cm">//</span>
+<span class="cm">// Warum wird bei geraet2 die Drucker-Ausgabe verwendet?</span>
+<span class="cm">//   → geraet2 wurde mit "new Drucker(...)" erstellt → dynamischer Typ: Drucker</span>
+<span class="cm">//   → Java führt Drucker.datenAusgeben() aus</span>
+<span class="cm">//</span>
+<span class="cm">// Warum wird bei geraet3 die Switch-Ausgabe verwendet?</span>
+<span class="cm">//   → geraet3 wurde mit "new Switch(...)" erstellt → dynamischer Typ: Switch</span>
+<span class="cm">//   → Java führt Switch.datenAusgeben() aus</span></code></pre>
         </div>
       </div>
-
     </div>
-  </div>
-</section>
 
+  </div><!-- /steps -->
+</div>
+</section>
 <div class="divider"></div>
 
-<!-- ===== HAUPTAUFGABE 3 ===== -->
+<!-- ══════════════════════════════════════════════ -->
+<!-- HAUPTAUFGABE 3 -->
+<!-- ══════════════════════════════════════════════ -->
 <section id="ha3">
-  <div class="container">
+<div class="wrap">
 
-    <div class="reveal">
-      <div class="section-label c-orange">Hauptaufgabe 3</div>
-      <h2 class="section-title">Polymorphes Array mit Schleife</h2>
-      <p class="section-desc">
-        Polymorphie wird richtig mächtig, wenn man viele verschiedene Objekte gemeinsam
-        speichert und verarbeitet. Ein <strong>Array der Oberklasse</strong> kann Objekte
-        aller Unterklassen aufnehmen.
-      </p>
+  <div class="rv">
+    <div class="sec-label c-orange">Hauptaufgabe 3</div>
+    <h2 class="sec-title">Polymorphes Array mit Schleife</h2>
+    <p class="sec-desc">
+      <strong>Aufgabenstellung:</strong> Erstelle ein Array vom Typ <code class="ic">Geraet[]</code> mit 6 Einträgen (2 Laptops, 2 Drucker, 2 Switches). Gib alle Geräte mit einer Schleife aus. Zähle Geräte nach Status. Ändere einen Status mit <code class="ic">setStatus()</code>.
+    </p>
+  </div>
+
+  <div class="rv">
+    <div class="analogy">
+      <div class="analogy-title">📦 Die Idee: Warum ist das Array so mächtig?</div>
+      <p>Ohne Polymorphie bräuchtest du 3 separate Arrays: <code class="ic">Laptop[] laptops</code>, <code class="ic">Drucker[] drucker</code>, <code class="ic">Switch[] switches</code> – und 3 separate Schleifen. Mit Polymorphie reicht <strong>ein Array</strong> und <strong>eine Schleife</strong>. Wenn du später eine neue Geräteklasse <code class="ic">Tablet</code> hinzufügst, funktioniert die Schleife sofort ohne Änderungen!</p>
+    </div>
+  </div>
+
+  <div class="steps">
+
+    <div class="step open rv">
+      <div class="step-hdr" onclick="tog(this)">
+        <div class="step-num" style="background:#ffa65722;color:var(--orange)">1</div>
+        <div class="step-info">
+          <div class="step-name">Array erstellen und mit 6 Geräten befüllen</div>
+          <div class="step-hint">Geraet[] – 2 Laptops, 2 Drucker, 2 Switches</div>
+        </div>
+        <div class="step-arr">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="howto">
+          <div class="howto-title">📋 Schritt-für-Schritt: So löst du das</div>
+          <ol>
+            <li>Schreibe: <code>Geraet[] geraete = new Geraet[6];</code> – ein Array für 6 Geräte</li>
+            <li>Fülle Index 0 und 1 mit <code>new Laptop(...)</code></li>
+            <li>Fülle Index 2 und 3 mit <code>new Drucker(...)</code></li>
+            <li>Fülle Index 4 und 5 mit <code>new Switch(...)</code></li>
+            <li>Wichtig: Alle Parameter in der <strong>richtigen Reihenfolge</strong> angeben</li>
+          </ol>
+        </div>
+        <div class="callout info">
+          <span class="callout-icon">💡</span>
+          <div class="callout-body">
+            <strong>Warum kann ein Laptop in ein Geraet[] gespeichert werden?</strong>
+            <p><code class="ic">Laptop extends Geraet</code> → Laptop IST ein Geraet. Genau wie ein Hund ein Tier ist und in ein <code class="ic">Tier[]</code> passt. Java erlaubt es, Unterklassenobjekte in Arrays der Oberklasse zu speichern.</p>
+          </div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">Main.java – Array befüllen</div></div>
+          <pre><code><span class="cls">Geraet</span>[] geraete = <span class="kw">new</span> <span class="cls">Geraet</span>[<span class="num">6</span>];  <span class="cm">// Platz für 6 Geräte (Index 0 bis 5)</span>
+
+<span class="cm">// ── Laptops (Index 0 und 1) ───────────────────────────────────────────────</span>
+geraete[<span class="num">0</span>] = <span class="kw">new</span> <span class="cls">Laptop</span>(<span class="str">"IT-1001"</span>, <span class="str">"Lenovo"</span>,  <span class="str">"ThinkPad T14"</span>,   <span class="str">"Raum 101"</span>,   <span class="str">"aktiv"</span>,   <span class="num">16</span>);
+geraete[<span class="num">1</span>] = <span class="kw">new</span> <span class="cls">Laptop</span>(<span class="str">"IT-1002"</span>, <span class="str">"Dell"</span>,    <span class="str">"Latitude 5440"</span>,  <span class="str">"Raum 102"</span>,   <span class="str">"aktiv"</span>,   <span class="num">32</span>);
+
+<span class="cm">// ── Drucker (Index 2 und 3) ───────────────────────────────────────────────</span>
+geraete[<span class="num">2</span>] = <span class="kw">new</span> <span class="cls">Drucker</span>(<span class="str">"IT-2001"</span>, <span class="str">"HP"</span>,    <span class="str">"LaserJet Pro"</span>,  <span class="str">"Raum 204"</span>,   <span class="str">"aktiv"</span>,   <span class="str">"Laserdruck"</span>);
+geraete[<span class="num">3</span>] = <span class="kw">new</span> <span class="cls">Drucker</span>(<span class="str">"IT-2002"</span>, <span class="str">"Canon"</span>, <span class="str">"Pixma G3570"</span>,   <span class="str">"Raum 205"</span>,   <span class="str">"offline"</span>, <span class="str">"Tintenstrahl"</span>);
+
+<span class="cm">// ── Switches (Index 4 und 5) ──────────────────────────────────────────────</span>
+geraete[<span class="num">4</span>] = <span class="kw">new</span> <span class="cls">Switch</span>(<span class="str">"IT-3001"</span>, <span class="str">"Cisco"</span>,   <span class="str">"CBS350"</span>,   <span class="str">"Serverraum"</span>, <span class="str">"wartung"</span>, <span class="num">24</span>, <span class="kw">true</span>);
+geraete[<span class="num">5</span>] = <span class="kw">new</span> <span class="cls">Switch</span>(<span class="str">"IT-3002"</span>, <span class="str">"TP-Link"</span>, <span class="str">"TL-SG108"</span>, <span class="str">"Raum 110"</span>,   <span class="str">"aktiv"</span>,   <span class="num">8</span>,  <span class="kw">false</span>);</code></pre>
+        </div>
+      </div>
     </div>
 
-    <div class="steps reveal">
-
-      <!-- Array erstellen -->
-      <div class="step open">
-        <div class="step-header" onclick="toggleStep(this)">
-          <div class="step-num" style="background:#ffa65725;color:var(--accent-orange)">1</div>
-          <div class="step-info">
-            <div class="step-name">Array erstellen und befüllen</div>
-            <div class="step-hint">Geraet[] nimmt Laptop, Drucker und Switch auf</div>
-          </div>
-          <div class="step-toggle">▼</div>
+    <div class="step rv">
+      <div class="step-hdr" onclick="tog(this)">
+        <div class="step-num" style="background:#ffa65722;color:var(--orange)">2</div>
+        <div class="step-info">
+          <div class="step-name">Alle Geräte mit for-Schleife ausgeben</div>
+          <div class="step-hint">Immer gleicher Aufruf – automatisch richtige Version</div>
         </div>
-        <div class="step-body">
-          <p>Ein <code style="color:var(--accent-blue)">Geraet[]</code>-Array kann jedes Objekt speichern, das von Geraet erbt. Das ist möglich weil <em>Laptop IST ein Geraet</em> (extends Geraet).</p>
-          <div class="code-block">
-            <div class="code-header">
-              <div class="code-dots"><div class="code-dot cd-red"></div><div class="code-dot cd-yellow"></div><div class="code-dot cd-green"></div></div>
-              <div class="code-lang">Main.java – Array befüllen</div>
-            </div>
-            <pre><code><span class="cls">Geraet</span>[] geraete = <span class="kw">new</span> <span class="cls">Geraet</span>[<span class="num">6</span>];  <span class="cm">// Array für 6 Geräte</span>
-
-<span class="cm">// Laptops:</span>
-geraete[<span class="num">0</span>] = <span class="kw">new</span> <span class="cls">Laptop</span>(<span class="str">"IT-1001"</span>, <span class="str">"Lenovo"</span>, <span class="str">"ThinkPad T14"</span>,  <span class="str">"Raum 101"</span>,   <span class="str">"aktiv"</span>,   <span class="num">16</span>);
-geraete[<span class="num">1</span>] = <span class="kw">new</span> <span class="cls">Laptop</span>(<span class="str">"IT-1002"</span>, <span class="str">"Dell"</span>,   <span class="str">"Latitude 5440"</span>, <span class="str">"Raum 102"</span>,   <span class="str">"aktiv"</span>,   <span class="num">32</span>);
-
-<span class="cm">// Drucker:</span>
-geraete[<span class="num">2</span>] = <span class="kw">new</span> <span class="cls">Drucker</span>(<span class="str">"IT-2001"</span>, <span class="str">"HP"</span>,    <span class="str">"LaserJet Pro"</span>, <span class="str">"Raum 204"</span>,   <span class="str">"aktiv"</span>,   <span class="str">"Laserdruck"</span>);
-geraete[<span class="num">3</span>] = <span class="kw">new</span> <span class="cls">Drucker</span>(<span class="str">"IT-2002"</span>, <span class="str">"Canon"</span>, <span class="str">"Pixma G3570"</span>,  <span class="str">"Raum 205"</span>,   <span class="str">"offline"</span>, <span class="str">"Tintenstrahl"</span>);
-
-<span class="cm">// Switches:</span>
-geraete[<span class="num">4</span>] = <span class="kw">new</span> <span class="cls">Switch</span>(<span class="str">"IT-3001"</span>, <span class="str">"Cisco"</span>,   <span class="str">"CBS350"</span>,   <span class="str">"Serverraum"</span>, <span class="str">"wartung"</span>, <span class="num">24</span>, <span class="kw">true</span>);
-geraete[<span class="num">5</span>] = <span class="kw">new</span> <span class="cls">Switch</span>(<span class="str">"IT-3002"</span>, <span class="str">"TP-Link"</span>, <span class="str">"TL-SG108"</span>, <span class="str">"Raum 110"</span>,   <span class="str">"aktiv"</span>,   <span class="num">8</span>, <span class="kw">false</span>);
-
-<span class="cm">// Warum kann ein Laptop in Geraet[] gespeichert werden?</span>
-<span class="cm">// → Laptop extends Geraet → Laptop IST ein Geraet</span>
-<span class="cm">// → Genau wie: Ein Hund IST ein Tier und passt in ein Tier[]</span></code></pre>
-          </div>
-        </div>
+        <div class="step-arr">▼</div>
       </div>
-
-      <!-- Schleife -->
-      <div class="step">
-        <div class="step-header" onclick="toggleStep(this)">
-          <div class="step-num" style="background:#ffa65725;color:var(--accent-orange)">2</div>
-          <div class="step-info">
-            <div class="step-name">Alle Geräte mit Schleife ausgeben</div>
-            <div class="step-hint">Immer gleicher Aufruf – verschiedene Ausgaben</div>
-          </div>
-          <div class="step-toggle">▼</div>
+      <div class="step-body">
+        <div class="howto">
+          <div class="howto-title">📋 Schritt-für-Schritt: So löst du das</div>
+          <ol>
+            <li>Schreibe eine <code>for</code>-Schleife: <code>for (int i = 0; i &lt; geraete.length; i++)</code></li>
+            <li>Im Schleifenrumpf: Gib zuerst eine Trennzeile aus: <code>System.out.println("--- Gerät " + (i+1) + " ---");</code></li>
+            <li>Dann: <code>geraete[i].datenAusgeben();</code> – Java ruft automatisch die richtige Version auf</li>
+            <li>Danach: <code>System.out.println();</code> für eine Leerzeile zwischen den Geräten</li>
+          </ol>
         </div>
-        <div class="step-body">
-          <div class="code-block">
-            <div class="code-header">
-              <div class="code-dots"><div class="code-dot cd-red"></div><div class="code-dot cd-yellow"></div><div class="code-dot cd-green"></div></div>
-              <div class="code-lang">Main.java – Schleife</div>
-            </div>
-            <pre><code><span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < geraete.length; i++) {
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">Main.java – Schleife ausgeben</div></div>
+          <pre><code><span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < geraete.length; i++) {
     System.out.<span class="fn">println</span>(<span class="str">"--- Gerät "</span> + (i + <span class="num">1</span>) + <span class="str">" ---"</span>);
-<span class="hl">    geraete[i].<span class="fn">datenAusgeben</span>();  <span class="cm">// Polymorphie! Immer gleicher Aufruf...</span></span>
-    <span class="cm">// ...aber Java führt je nach Objekt die richtige Version aus:
-    // i=0: Laptop.datenAusgeben()  → + RAM
-    // i=2: Drucker.datenAusgeben() → + Druckverfahren
-    // i=4: Switch.datenAusgeben()  → + Ports + Managed</span>
-    System.out.<span class="fn">println</span>();
+
+<span class="hl">    geraete[i].<span class="fn">datenAusgeben</span>();  <span class="cm">// ← IMMER gleicher Aufruf!</span></span>
+    <span class="cm">    // Java schaut: Was ist geraete[i] tatsächlich?</span>
+    <span class="cm">    // i=0: Laptop  → Laptop.datenAusgeben()  (inkl. RAM)</span>
+    <span class="cm">    // i=1: Laptop  → Laptop.datenAusgeben()  (inkl. RAM)</span>
+    <span class="cm">    // i=2: Drucker → Drucker.datenAusgeben() (inkl. Druckverfahren)</span>
+    <span class="cm">    // i=3: Drucker → Drucker.datenAusgeben() (inkl. Druckverfahren)</span>
+    <span class="cm">    // i=4: Switch  → Switch.datenAusgeben()  (inkl. Ports + Managed)</span>
+    <span class="cm">    // i=5: Switch  → Switch.datenAusgeben()  (inkl. Ports + Managed)</span>
+
+    System.out.<span class="fn">println</span>(); <span class="cm">// Leerzeile zwischen Geräten</span>
 }</code></pre>
-          </div>
-          <div class="callout info">
-            <span class="callout-icon">🎯</span>
-            <div class="callout-body">
-              <strong>Das ist der Vorteil von Polymorphie!</strong>
-              <p>Statt 3 verschiedener Schleifen für Laptop, Drucker und Switch reicht <em>eine einzige</em> Schleife. Wenn du später eine neue Klasse <code>Tablet</code> hinzufügst, funktioniert die Schleife sofort – ohne Änderungen!</p>
-            </div>
+        </div>
+        <div class="callout tip">
+          <span class="callout-icon">🎯</span>
+          <div class="callout-body">
+            <strong>Das ist der Kern der Polymorphie!</strong>
+            <p>Eine Schleife, ein Aufruf – und Java macht automatisch das Richtige. Ohne Polymorphie bräuchtest du 3 separate Schleifen mit <code class="ic">if (geraete[i] instanceof Laptop)</code> usw. Das ist unelegant und fehleranfällig.</p>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Status -->
-      <div class="step">
-        <div class="step-header" onclick="toggleStep(this)">
-          <div class="step-num" style="background:#ffa65725;color:var(--accent-orange)">3</div>
-          <div class="step-info">
-            <div class="step-name">Status auswerten mit getStatus()</div>
-            <div class="step-hint">Aktiv / Offline / Wartung zählen</div>
-          </div>
-          <div class="step-toggle">▼</div>
+    <div class="step rv">
+      <div class="step-hdr" onclick="tog(this)">
+        <div class="step-num" style="background:#ffa65722;color:var(--orange)">3</div>
+        <div class="step-info">
+          <div class="step-name">Status auswerten (aktiv / offline / wartung zählen)</div>
+          <div class="step-hint">getStatus() + equals() + Zähler-Variablen</div>
         </div>
-        <div class="step-body">
-          <div class="code-block">
-            <div class="code-header">
-              <div class="code-dots"><div class="code-dot cd-red"></div><div class="code-dot cd-yellow"></div><div class="code-dot cd-green"></div></div>
-              <div class="code-lang">Main.java – Status zählen</div>
-            </div>
-            <pre><code><span class="kw">int</span> aktiveGeraete  = <span class="num">0</span>;
+        <div class="step-arr">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="howto">
+          <div class="howto-title">📋 Schritt-für-Schritt: So löst du das</div>
+          <ol>
+            <li>Erstelle 3 Zähler-Variablen: <code>int aktiveGeraete = 0;</code> usw.</li>
+            <li>Schleife über das Array</li>
+            <li>In der Schleife: <code>String status = geraete[i].getStatus();</code> – Getter verwenden!</li>
+            <li>Mit <code>if/else if</code> den Status prüfen und den passenden Zähler erhöhen (<code>++</code>)</li>
+            <li>Nach der Schleife: Zähler ausgeben</li>
+          </ol>
+        </div>
+        <div class="callout warn">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            <strong>Strings immer mit .equals() vergleichen, nie mit ==</strong>
+            <p><code class="ic">status == "aktiv"</code> → ❌ FALSCH! In Java vergleicht <code class="ic">==</code> bei Strings die Speicheradresse, nicht den Inhalt. Verwende immer <code class="ic">status.equals("aktiv")</code> → ✅ RICHTIG!</p>
+          </div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">Main.java – Status auswerten &amp; ändern</div></div>
+          <pre><code><span class="cm">// ── Zähler initialisieren ──────────────────────────────────────────────────</span>
+<span class="kw">int</span> aktiveGeraete  = <span class="num">0</span>;
 <span class="kw">int</span> offlineGeraete = <span class="num">0</span>;
 <span class="kw">int</span> wartungGeraete = <span class="num">0</span>;
 
+<span class="cm">// ── Status jedes Geräts prüfen ────────────────────────────────────────────</span>
 <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < geraete.length; i++) {
-    <span class="tp">String</span> status = geraete[i].<span class="fn">getStatus</span>();  <span class="cm">// Getter aus Geraet</span>
+    <span class="tp">String</span> status = geraete[i].<span class="fn">getStatus</span>();  <span class="cm">// Getter aus Geraet aufrufen</span>
 
+    <span class="cm">// equals() für String-Vergleich verwenden (NICHT ==)!</span>
     <span class="kw">if</span> (status.<span class="fn">equals</span>(<span class="str">"aktiv"</span>)) {
         aktiveGeraete++;
     } <span class="kw">else if</span> (status.<span class="fn">equals</span>(<span class="str">"offline"</span>)) {
@@ -1146,201 +1206,284 @@ geraete[<span class="num">5</span>] = <span class="kw">new</span> <span class="c
     }
 }
 
-System.out.<span class="fn">println</span>(<span class="str">"Aktive Geräte:  "</span> + aktiveGeraete);
-System.out.<span class="fn">println</span>(<span class="str">"Offline Geräte: "</span> + offlineGeraete);
-System.out.<span class="fn">println</span>(<span class="str">"Wartung:        "</span> + wartungGeraete);
+System.out.<span class="fn">println</span>(<span class="str">"Aktive Geräte:  "</span> + aktiveGeraete);   <span class="cm">// → 3</span>
+System.out.<span class="fn">println</span>(<span class="str">"Offline Geräte: "</span> + offlineGeraete);  <span class="cm">// → 1</span>
+System.out.<span class="fn">println</span>(<span class="str">"Wartung:        "</span> + wartungGeraete);  <span class="cm">// → 2</span>
 
-<span class="cm">// Status eines Geräts ändern:</span>
-geraete[<span class="num">3</span>].<span class="fn">setStatus</span>(<span class="str">"aktiv"</span>);  <span class="cm">// Drucker wurde repariert!</span></code></pre>
-          </div>
-          <div class="result">
-            <div class="result-label">🖥️ Ausgabe (vorher)</div>
-            Aktive Geräte:  3<br/>
-            Offline Geräte: 1<br/>
-            Wartung:        2
-          </div>
+<span class="cm">// ── Status ändern mit setStatus() (Schritt 4) ─────────────────────────────</span>
+System.out.<span class="fn">println</span>(<span class="str">"\nDrucker Canon wird repariert → Status auf aktiv"</span>);
+geraete[<span class="num">3</span>].<span class="fn">setStatus</span>(<span class="str">"aktiv"</span>);  <span class="cm">// Index 3 = Canon Drucker</span>
+
+<span class="cm">// ── Kommentar (Schritt 5) ────────────────────────────────────────────────</span>
+<span class="cm">// Warum kann ein Laptop in einem Geraet[] gespeichert werden?</span>
+<span class="cm">//   → Laptop extends Geraet → Laptop IST ein Geraet</span>
+<span class="cm">//   → Java erlaubt: Unterklassenobjekte in Arrays der Oberklasse speichern</span>
+<span class="cm">//</span>
+<span class="cm">// Warum wird trotzdem die Laptop-Version von datenAusgeben() ausgeführt?</span>
+<span class="cm">//   → Java schaut zur Laufzeit auf den dynamischen Typ (Laptop)</span>
+<span class="cm">//   → Nicht auf den statischen Typ (Geraet)</span>
+<span class="cm">//   → Das ist dynamisches Binden – der Kern der Polymorphie!</span></code></pre>
+        </div>
+        <div class="output">
+          <div class="output-lbl">🖥️ Ausgabe Statusauswertung (vorher)</div>
+          Aktive Geräte:  3<br/>
+          Offline Geräte: 1<br/>
+          Wartung:        2
         </div>
       </div>
-
     </div>
-  </div>
-</section>
 
+  </div>
+</div>
+</section>
 <div class="divider"></div>
 
-<!-- ===== ZUSATZAUFGABE 1 ===== -->
+<!-- ══════════════════════════════════════════════ -->
+<!-- ZUSATZAUFGABE 1 -->
+<!-- ══════════════════════════════════════════════ -->
 <section id="za1">
-  <div class="container">
-    <div class="reveal">
-      <div class="section-label c-purple">Zusatzaufgabe 1</div>
-      <h2 class="section-title">Methode mit Oberklassen-Parameter</h2>
-      <p class="section-desc">Eine Methode kann einen Parameter vom Typ der Oberklasse bekommen. Dann kann man beliebige Unterklassenobjekte übergeben.</p>
-    </div>
-    <div class="reveal">
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-dots"><div class="code-dot cd-red"></div><div class="code-dot cd-yellow"></div><div class="code-dot cd-green"></div></div>
-          <div class="code-lang">Main.java – Zusatzaufgabe 1</div>
+<div class="wrap">
+  <div class="rv">
+    <div class="sec-label c-purple">Zusatzaufgabe 1</div>
+    <h2 class="sec-title">Methode mit Oberklassen-Parameter</h2>
+    <p class="sec-desc"><strong>Aufgabe:</strong> Schreibe eine statische Methode <code class="ic">geraetAnzeigen(Geraet geraet)</code> in Main. Rufe sie mit Laptop-, Drucker- und Switch-Objekten auf. Erkläre warum das Polymorphie ist.</p>
+  </div>
+  <div class="steps rv">
+    <div class="step open">
+      <div class="step-hdr" onclick="tog(this)">
+        <div class="step-num" style="background:#bc8cff22;color:var(--purple)">1</div>
+        <div class="step-info">
+          <div class="step-name">Methode schreiben &amp; aufrufen</div>
+          <div class="step-hint">static void geraetAnzeigen(Geraet geraet)</div>
         </div>
-        <pre><code><span class="cm">// Eine Methode für ALLE Gerätetypen:</span>
+        <div class="step-arr">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="howto">
+          <div class="howto-title">📋 Schritt-für-Schritt: So löst du das</div>
+          <ol>
+            <li>Schreibe die Methode <strong>außerhalb</strong> von <code>main()</code>, aber noch innerhalb der Klasse <code>Main</code></li>
+            <li>Sie muss <code>public static void</code> sein (static weil sie ohne Objekt aufgerufen wird)</li>
+            <li>Parameter: <code>Geraet geraet</code> (Oberklassen-Typ!)</li>
+            <li>In der Methode: <code>geraet.datenAusgeben();</code></li>
+            <li>In <code>main()</code>: Rufe sie mit verschiedenen Objekten auf</li>
+          </ol>
+        </div>
+        <div class="compare">
+          <div class="compare-box bad">
+            <div class="compare-lbl">❌ Ohne Polymorphie (schlechter Code)</div>
+            <p>Drei separate Methoden:<br/><code class="ic">laptopAnzeigen(Laptop l)</code><br/><code class="ic">druckerAnzeigen(Drucker d)</code><br/><code class="ic">switchAnzeigen(Switch s)</code><br/>→ Code-Duplizierung!</p>
+          </div>
+          <div class="compare-box good">
+            <div class="compare-lbl">✅ Mit Polymorphie (guter Code)</div>
+            <p>Eine Methode für alles:<br/><code class="ic">geraetAnzeigen(Geraet g)</code><br/><br/>Funktioniert mit Laptop, Drucker AND Switch!</p>
+          </div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">Main.java – Zusatzaufgabe 1</div></div>
+          <pre><code><span class="cm">// ── Die Methode (außerhalb von main(), innerhalb von class Main) ──────────</span>
+<span class="cm">/**
+ * Diese Methode nimmt jeden Geraet-Typ entgegen.
+ * Dank Polymorphie wird automatisch die richtige datenAusgeben()-Version aufgerufen.
+ * VORTEIL: Eine Methode für alle Gerätetypen statt 3 separater Methoden!
+ */</span>
 <span class="kw">public static void</span> <span class="fn">geraetAnzeigen</span>(<span class="cls">Geraet</span> geraet) {
     System.out.<span class="fn">println</span>(<span class="str">"=== Gerät wird angezeigt ==="</span>);
-    geraet.<span class="fn">datenAusgeben</span>();  <span class="cm">// Polymorphie! Richtige Methode je nach Objekt</span>
+    geraet.<span class="fn">datenAusgeben</span>();  <span class="cm">// Polymorphie! Java führt die richtige Methode aus.</span>
 }
 
-<span class="cm">// Aufruf mit verschiedenen Typen (alle funktionieren!):</span>
+<span class="cm">// ── In main() aufrufen ────────────────────────────────────────────────────</span>
 <span class="fn">geraetAnzeigen</span>(<span class="kw">new</span> <span class="cls">Laptop</span>(<span class="str">"IT-9001"</span>, <span class="str">"Apple"</span>, <span class="str">"MacBook Air"</span>, <span class="str">"Büro"</span>, <span class="str">"aktiv"</span>, <span class="num">8</span>));
+System.out.<span class="fn">println</span>();
 <span class="fn">geraetAnzeigen</span>(<span class="kw">new</span> <span class="cls">Drucker</span>(<span class="str">"IT-9002"</span>, <span class="str">"Brother"</span>, <span class="str">"HL-L3270CDW"</span>, <span class="str">"Büro"</span>, <span class="str">"aktiv"</span>, <span class="str">"Laserdruck"</span>));
+System.out.<span class="fn">println</span>();
 <span class="fn">geraetAnzeigen</span>(<span class="kw">new</span> <span class="cls">Switch</span>(<span class="str">"IT-9003"</span>, <span class="str">"Netgear"</span>, <span class="str">"GS308"</span>, <span class="str">"Keller"</span>, <span class="str">"aktiv"</span>, <span class="num">8</span>, <span class="kw">false</span>));</code></pre>
-      </div>
-      <div class="callout tip">
-        <span class="callout-icon">✅</span>
-        <div class="callout-body">
-          <strong>Vorteil:</strong>
-          <p>Statt 3 Methoden <code>laptopAnzeigen()</code>, <code>druckerAnzeigen()</code>, <code>switchAnzeigen()</code> braucht man nur <strong>eine einzige</strong> Methode <code>geraetAnzeigen(Geraet)</code>!</p>
         </div>
       </div>
     </div>
   </div>
+</div>
 </section>
-
 <div class="divider"></div>
 
-<!-- ===== ZUSATZAUFGABE 2 ===== -->
+<!-- ══════════════════════════════════════════════ -->
+<!-- ZUSATZAUFGABE 2 -->
+<!-- ══════════════════════════════════════════════ -->
 <section id="za2">
-  <div class="container">
-    <div class="reveal">
-      <div class="section-label c-red">Zusatzaufgabe 2</div>
-      <h2 class="section-title">instanceof und Casting</h2>
-      <p class="section-desc">
-        Was passiert wenn eine spezielle Methode nur in der Unterklasse existiert, die Variable aber den Typ der Oberklasse hat?
-      </p>
-    </div>
-    <div class="steps reveal">
-      <div class="step open">
-        <div class="step-header" onclick="toggleStep(this)">
-          <div class="step-num" style="background:#ff7b7225;color:var(--accent-red)">!</div>
-          <div class="step-info">
-            <div class="step-name">Das Problem – akkuStatusAusgeben() ist nicht erreichbar</div>
-            <div class="step-hint">Statischer Typ Geraet kennt die Methode nicht</div>
-          </div>
-          <div class="step-toggle">▼</div>
-        </div>
-        <div class="step-body">
-          <p>Laptop hat eine Methode <code style="color:var(--accent-purple)">akkuStatusAusgeben()</code> – aber Geraet nicht. Wenn die Variable den Typ <code>Geraet</code> hat, kann Java diese Methode nicht finden!</p>
-          <div class="code-block">
-            <div class="code-header">
-              <div class="code-dots"><div class="code-dot cd-red"></div><div class="code-dot cd-yellow"></div><div class="code-dot cd-green"></div></div>
-              <div class="code-lang">Das Problem</div>
-            </div>
-            <pre><code><span class="cls">Geraet</span> g = <span class="kw">new</span> <span class="cls">Laptop</span>(<span class="str">"IT-5001"</span>, <span class="str">"HP"</span>, <span class="str">"EliteBook"</span>, <span class="str">"Raum 3"</span>, <span class="str">"aktiv"</span>, <span class="num">16</span>);
+<div class="wrap">
+  <div class="rv">
+    <div class="sec-label c-red">Zusatzaufgabe 2</div>
+    <h2 class="sec-title">Spezielle Methode &amp; instanceof</h2>
+    <p class="sec-desc"><strong>Aufgabe:</strong> Füge in <code class="ic">Laptop</code> eine Methode <code class="ic">akkuStatusAusgeben()</code> hinzu. Erstelle eine Variable vom Typ <code class="ic">Geraet</code> die auf ein Laptop-Objekt zeigt. Zeige, wie man die Laptop-spezifische Methode mit <code class="ic">instanceof</code> und Casting aufruft.</p>
+  </div>
+  <div class="steps rv">
 
-<span class="cm">// ❌ FEHLER – Compilerfehler!</span>
-<span class="cm">// g.akkuStatusAusgeben();</span>
-<span class="cm">// → "The method akkuStatusAusgeben() is undefined for the type Geraet"</span>
-<span class="cm">// → Geraet kennt diese Methode nicht!</span></code></pre>
-          </div>
-          <div class="callout danger">
-            <span class="callout-icon">❌</span>
-            <div class="callout-body">
-              <strong>Warum passiert das?</strong>
-              <p>Der statische Typ (links bei der Variable) ist <code>Geraet</code>. Java erlaubt nur Methoden aufzurufen, die in <code>Geraet</code> definiert sind. <code>akkuStatusAusgeben()</code> existiert nur in <code>Laptop</code> – der Compiler sieht das nicht!</p>
-            </div>
-          </div>
+    <div class="step open">
+      <div class="step-hdr" onclick="tog(this)">
+        <div class="step-num" style="background:#ff7b7222;color:var(--red)">1</div>
+        <div class="step-info">
+          <div class="step-name">Das Problem verstehen</div>
+          <div class="step-hint">Warum funktioniert der direkte Aufruf nicht?</div>
+        </div>
+        <div class="step-arr">▼</div>
+      </div>
+      <div class="step-body">
+        <p>Wenn eine Variable den statischen Typ <code class="ic">Geraet</code> hat, kennt der Java-Compiler nur die Methoden, die in <code class="ic">Geraet</code> definiert sind. <code class="ic">akkuStatusAusgeben()</code> existiert aber nur in <code class="ic">Laptop</code> – Geraet kennt sie nicht!</p>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">Das Problem</div></div>
+          <pre><code><span class="cm">// Laptop.java: Diese Methode ist NUR in Laptop, NICHT in Geraet!</span>
+<span class="kw">public void</span> <span class="fn">akkuStatusAusgeben</span>() {
+    System.out.<span class="fn">println</span>(<span class="str">"Akku wird geprüft."</span>);
+}
+
+<span class="cm">// In Main.java:</span>
+<span class="cls">Geraet</span> g = <span class="kw">new</span> <span class="cls">Laptop</span>(<span class="str">"IT-5001"</span>, <span class="str">"HP"</span>, <span class="str">"EliteBook"</span>, <span class="str">"Raum 3"</span>, <span class="str">"aktiv"</span>, <span class="num">16</span>);
+
+<span class="hl-red"><span class="cm">// g.akkuStatusAusgeben(); ← COMPILERFEHLER!</span></span>
+<span class="cm">// Eclipse zeigt: "The method akkuStatusAusgeben() is undefined for the type Geraet"</span>
+<span class="cm">// Begründung: Der statische Typ von g ist Geraet.</span>
+<span class="cm">// Der Compiler sieht nur was in Geraet definiert ist.</span>
+<span class="cm">// akkuStatusAusgeben() steht nicht in Geraet → Compilerfehler!</span></code></pre>
         </div>
       </div>
-      <div class="step">
-        <div class="step-header" onclick="toggleStep(this)">
-          <div class="step-num" style="background:#ff7b7225;color:var(--accent-red)">✓</div>
-          <div class="step-info">
-            <div class="step-name">Die Lösung – instanceof + Casting</div>
-            <div class="step-hint">Typ prüfen, dann sicher umwandeln</div>
-          </div>
-          <div class="step-toggle">▼</div>
+    </div>
+
+    <div class="step">
+      <div class="step-hdr" onclick="tog(this)">
+        <div class="step-num" style="background:#ff7b7222;color:var(--red)">2</div>
+        <div class="step-info">
+          <div class="step-name">Lösung: instanceof + Casting</div>
+          <div class="step-hint">Typ prüfen → sicher umwandeln → Methode aufrufen</div>
         </div>
-        <div class="step-body">
-          <div class="code-block">
-            <div class="code-header">
-              <div class="code-dots"><div class="code-dot cd-red"></div><div class="code-dot cd-yellow"></div><div class="code-dot cd-green"></div></div>
-              <div class="code-lang">Lösung: instanceof + Casting</div>
-            </div>
-            <pre><code><span class="cls">Geraet</span> g = <span class="kw">new</span> <span class="cls">Laptop</span>(...);
+        <div class="step-arr">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="howto">
+          <div class="howto-title">📋 Schritt-für-Schritt: So löst du das</div>
+          <ol>
+            <li>Verwende <code>instanceof</code> um zu prüfen: "Ist g wirklich ein Laptop?"</li>
+            <li>Wenn ja: Caste (wandle den Typ um) mit <code>(Laptop) g</code></li>
+            <li>Speichere das Ergebnis in einer <code>Laptop</code>-Variable</li>
+            <li>Rufe jetzt die Laptop-Methode auf</li>
+            <li>Schreibe den Kommentar mit Erklärung</li>
+          </ol>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">Main.java – instanceof + Casting</div></div>
+          <pre><code><span class="cls">Geraet</span> g = <span class="kw">new</span> <span class="cls">Laptop</span>(<span class="str">"IT-5001"</span>, <span class="str">"HP"</span>, <span class="str">"EliteBook"</span>, <span class="str">"Raum 3"</span>, <span class="str">"aktiv"</span>, <span class="num">16</span>);
 
-<span class="cm">// Schritt 1: Sicher prüfen ob g wirklich ein Laptop ist</span>
-<span class="kw">if</span> (g <span class="kw">instanceof</span> <span class="cls">Laptop</span>) {
-    <span class="cm">// Schritt 2: Casten – sagen wir Java "behandle g als Laptop"</span>
-    <span class="cls">Laptop</span> laptop = (<span class="cls">Laptop</span>) g;  <span class="cm">// Downcasting: Geraet → Laptop</span>
+<span class="cm">// SCHRITT 1: Mit instanceof sicher prüfen ob g ein Laptop ist</span>
+<span class="hl-green"><span class="kw">if</span> (g <span class="kw">instanceof</span> <span class="cls">Laptop</span>) {</span>
+    <span class="cm">// SCHRITT 2: Casting – "wandle g von Geraet-Typ in Laptop-Typ um"</span>
+    <span class="cm">// Das nennt man DOWNCASTING (von Ober- zu Unterklasse)</span>
+<span class="hl">    <span class="cls">Laptop</span> laptop = (<span class="cls">Laptop</span>) g;</span>
 
-    <span class="cm">// Schritt 3: Jetzt geht die Laptop-Methode!</span>
-    laptop.<span class="fn">akkuStatusAusgeben</span>();  <span class="cm">// ✅ Kein Fehler!</span>
+    <span class="cm">// SCHRITT 3: Jetzt hat laptop den statischen Typ Laptop</span>
+    <span class="cm">// → alle Laptop-Methoden sind erreichbar!</span>
+    laptop.<span class="fn">akkuStatusAusgeben</span>();  <span class="cm">// ✅ Kein Fehler mehr!</span>
 }
 
 <span class="cm">// Warum brauchen wir instanceof?</span>
-<span class="cm">// → Ohne Prüfung könnte g ein Drucker sein → ClassCastException zur Laufzeit!</span>
-<span class="cm">// → instanceof macht den Cast sicher</span></code></pre>
-          </div>
-          <div class="result">
-            <div class="result-label">🖥️ Ausgabe</div>
-            Akku wird geprüft.
-          </div>
-          <table>
-            <tr><th>Begriff</th><th>Erklärung</th><th>Beispiel</th></tr>
-            <tr><td><span class="tag tag-blue">instanceof</span></td><td>Prüft ob ein Objekt von einem bestimmten Typ ist</td><td><code>g instanceof Laptop</code> → true/false</td></tr>
-            <tr><td><span class="tag tag-orange">Casting</span></td><td>Typ "umwandeln" – Geraet zu Laptop machen</td><td><code>(Laptop) g</code></td></tr>
-            <tr><td><span class="tag tag-red">Downcasting</span></td><td>Von Oberklasse zu Unterklasse casten</td><td>Geraet → Laptop</td></tr>
-          </table>
+<span class="cm">//   Stell dir vor, g wäre ein Drucker (new Drucker(...)).</span>
+<span class="cm">//   Dann würde (Laptop) g zur Laufzeit einen ClassCastException-Fehler werfen!</span>
+<span class="cm">//   instanceof prüft VORHER ob der Cast sicher ist.</span>
+<span class="cm">//   Wenn g kein Laptop ist, wird der if-Block einfach übersprungen – kein Fehler!</span></code></pre>
         </div>
+        <div class="output">
+          <div class="output-lbl">🖥️ Ausgabe</div>
+          Akku wird geprüft.
+        </div>
+        <table>
+          <tr><th>Begriff</th><th>Was passiert</th><th>Beispiel</th></tr>
+          <tr><td><span class="tag tag-b">instanceof</span></td><td>Prüft zur Laufzeit: Ist das Objekt von diesem Typ?</td><td><code>g instanceof Laptop</code> → true/false</td></tr>
+          <tr><td><span class="tag tag-o">Casting</span></td><td>Wandelt den Typ der Variable um</td><td><code>(Laptop) g</code></td></tr>
+          <tr><td><span class="tag tag-r">Downcasting</span></td><td>Von Oberklasse zu Unterklasse</td><td>Geraet → Laptop</td></tr>
+          <tr><td><span class="tag tag-g">Upcasting</span></td><td>Von Unterklasse zu Oberklasse (automatisch)</td><td><code>Geraet g = new Laptop()</code></td></tr>
+        </table>
       </div>
     </div>
-  </div>
-</section>
 
+  </div>
+</div>
+</section>
 <div class="divider"></div>
 
-<!-- ===== ZUSATZAUFGABE 3 ===== -->
+<!-- ══════════════════════════════════════════════ -->
+<!-- ZUSATZAUFGABE 3 -->
+<!-- ══════════════════════════════════════════════ -->
 <section id="za3">
-  <div class="container">
-    <div class="reveal">
-      <div class="section-label c-pink">Zusatzaufgabe 3</div>
-      <h2 class="section-title">Abstrakte Klassen</h2>
-      <p class="section-desc">Manchmal soll eine Klasse nur als Vorlage dienen – man soll kein Objekt direkt davon erzeugen können. Dafür gibt es <strong>abstrakte Klassen</strong>.</p>
+<div class="wrap">
+  <div class="rv">
+    <div class="sec-label c-pink">Zusatzaufgabe 3</div>
+    <h2 class="sec-title">Abstrakte Klassen</h2>
+    <p class="sec-desc"><strong>Aufgabe:</strong> Ändere die Klasse <code class="ic">Geraet</code> zu einer abstrakten Klasse. Mache <code class="ic">datenAusgeben()</code> abstrakt. Prüfe dass <code class="ic">new Geraet()</code> nicht mehr funktioniert, aber <code class="ic">new Laptop()</code> weiterhin geht.</p>
+  </div>
+  <div class="rv">
+    <div class="analogy">
+      <div class="analogy-title">🏗️ Analogie: Bauplan vs. fertiges Haus</div>
+      <p>Eine abstrakte Klasse ist wie ein <strong>Bauplan</strong>. Ein Bauplan beschreibt, welche Räume ein Haus haben soll – aber man kann in einem Bauplan nicht wohnen. Man braucht ein konkretes Haus (Unterklasse). Genauso: Man kann kein abstraktes Tier erstellen, aber einen Hund schon.</p>
     </div>
-    <div class="reveal">
-      <div class="concept pink">
-        <div class="concept-header">
-          <div class="concept-icon bg-pink">🏗️</div>
-          <div class="concept-title">abstract – Bauplan ohne Objekt</div>
+  </div>
+  <div class="steps rv">
+    <div class="step open">
+      <div class="step-hdr" onclick="tog(this)">
+        <div class="step-num" style="background:#f778ba22;color:var(--pink)">1</div>
+        <div class="step-info">
+          <div class="step-name">Abstrakte Klasse &amp; abstrakte Methode verstehen</div>
+          <div class="step-hint">abstract class · abstract void · basisDatenAusgeben()</div>
         </div>
-        <p>Mit <code style="color:var(--accent-pink)">abstract</code> vor der Klasse wird sie zur <em>abstrakten Klasse</em>. Das bedeutet: <code>new Geraet()</code> ist nicht mehr möglich! Aber <code>new Laptop()</code> geht weiterhin, weil Laptop konkret ist.</p>
-        <p>Abstrakte <em>Methoden</em> haben keinen Rumpf (keine geschweifte Klammer). Alle Unterklassen <strong>müssen</strong> diese Methode überschreiben – sonst gibt es einen Compilerfehler.</p>
+        <div class="step-arr">▼</div>
       </div>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-dots"><div class="code-dot cd-red"></div><div class="code-dot cd-yellow"></div><div class="code-dot cd-green"></div></div>
-          <div class="code-lang">Ticket.java – abstrakte Klasse (Zusatzaufgabe 3 + 4)</div>
+      <div class="step-body">
+        <div class="howto">
+          <div class="howto-title">📋 Schritt-für-Schritt: So löst du das (am Beispiel Ticket)</div>
+          <ol>
+            <li>Schreibe <code>public abstract class Ticket</code> (abstract vor class)</li>
+            <li>Abstrakte Methoden haben <strong>keinen Rumpf</strong>: <code>public abstract void datenAusgeben();</code> – kein <code>{}</code>!</li>
+            <li>Nicht-abstrakte Methoden (<code>basisDatenAusgeben()</code>) behalten ihren Rumpf</li>
+            <li>Unterklassen <strong>müssen</strong> alle abstrakten Methoden mit <code>@Override</code> implementieren</li>
+            <li>In den Unterklassen: <code>basisDatenAusgeben()</code> aufrufen (ohne super., da nicht überschrieben)</li>
+          </ol>
         </div>
-        <pre><code><span class="cm">// abstract = kein new Ticket() möglich!</span>
+
+        <div class="compare">
+          <div class="compare-box bad">
+            <div class="compare-lbl">❌ Normale Klasse</div>
+            <p><code class="ic">new Geraet()</code> ist erlaubt. Man könnte ein "leeres" Geraet erzeugen, das gar nichts Sinnvolles tut. Das wollen wir verhindern.</p>
+          </div>
+          <div class="compare-box good">
+            <div class="compare-lbl">✅ Abstrakte Klasse</div>
+            <p><code class="ic">new Geraet()</code> → Compilerfehler. Man muss immer eine konkrete Unterklasse (Laptop, Drucker, Switch) verwenden.</p>
+          </div>
+        </div>
+
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">Ticket.java – abstrakte Klasse (für Zusatzaufgabe 4)</div></div>
+          <pre><code><span class="cm">// "abstract" vor "class" = kein new Ticket() möglich!</span>
 <span class="kw">public abstract class</span> <span class="cls">Ticket</span> {
 
+    <span class="cm">// Gemeinsame Attribute (protected = auch für Unterklassen zugänglich)</span>
     <span class="kw">protected</span> <span class="tp">String</span> ticketnummer;
     <span class="kw">protected</span> <span class="tp">String</span> titel;
     <span class="kw">protected</span> <span class="tp">String</span> beschreibung;
     <span class="kw">protected</span> <span class="tp">String</span> status;
 
+    <span class="cm">// Konstruktor (auch abstrakte Klassen können Konstruktoren haben!)</span>
     <span class="kw">public</span> <span class="cls">Ticket</span>(<span class="tp">String</span> ticketnummer, <span class="tp">String</span> titel,
                    <span class="tp">String</span> beschreibung, <span class="tp">String</span> status) {
         <span class="kw">this</span>.ticketnummer = ticketnummer;
-        <span class="kw">this</span>.titel = titel;
+        <span class="kw">this</span>.titel        = titel;
         <span class="kw">this</span>.beschreibung = beschreibung;
-        <span class="kw">this</span>.status = status;
+        <span class="kw">this</span>.status       = status;
     }
 
-    <span class="cm">// Abstrakte Methoden – kein Rumpf (kein {})!</span>
-    <span class="cm">// Jede Unterklasse MUSS diese implementieren:</span>
-<span class="hl">    <span class="kw">public abstract void</span> <span class="fn">datenAusgeben</span>();</span>
-<span class="hl">    <span class="kw">public abstract</span> <span class="tp">String</span> <span class="fn">prioritaetBerechnen</span>();</span>
+    <span class="cm">// ── ABSTRAKTE METHODEN (kein Rumpf, kein {}!) ─────────────────────────</span>
+    <span class="cm">// Alle Unterklassen MÜSSEN diese Methoden implementieren!</span>
+<span class="hl"><span class="kw">public abstract void</span> <span class="fn">datenAusgeben</span>();</span>       <span class="cm">// ← kein Rumpf!</span>
+<span class="hl"><span class="kw">public abstract</span> <span class="tp">String</span> <span class="fn">prioritaetBerechnen</span>();</span> <span class="cm">// ← kein Rumpf!</span>
 
-    <span class="cm">// Normale Methode (hat einen Rumpf) – kann aufgerufen werden:</span>
+    <span class="cm">// ── NORMALE (nicht-abstrakte) METHODE ─────────────────────────────────</span>
+    <span class="cm">// Hat einen Rumpf → Unterklassen können sie aufrufen</span>
     <span class="kw">public void</span> <span class="fn">basisDatenAusgeben</span>() {
         System.out.<span class="fn">println</span>(<span class="str">"Ticketnummer: "</span> + ticketnummer);
         System.out.<span class="fn">println</span>(<span class="str">"Titel:        "</span> + titel);
@@ -1351,267 +1494,337 @@ geraete[<span class="num">3</span>].<span class="fn">setStatus</span>(<span clas
     <span class="kw">public</span> <span class="tp">String</span> <span class="fn">getStatus</span>() { <span class="kw">return</span> status; }
     <span class="kw">public void</span> <span class="fn">setStatus</span>(<span class="tp">String</span> s) { <span class="kw">this</span>.status = s; }
 }</code></pre>
-      </div>
-      <div class="callout warn">
-        <span class="callout-icon">⚠️</span>
-        <div class="callout-body">
-          <strong>Wichtig:</strong>
-          <p><code>new Ticket(...)</code> → ❌ Compilerfehler! "Cannot instantiate the type Ticket"<br/>
-          <code>new HardwareTicket(...)</code> → ✅ Erlaubt! HardwareTicket ist konkret.</p>
+        </div>
+        <div class="callout danger">
+          <span class="callout-icon">🚫</span>
+          <div class="callout-body">
+            <strong>Dieser Code funktioniert nicht mehr!</strong>
+            <p><code class="ic">Ticket t = new Ticket(...);</code> → Compilerfehler: "Cannot instantiate the type Ticket"<br/>Das ist gewollt! Man braucht immer eine konkrete Unterklasse.</p>
+          </div>
+        </div>
+        <div class="callout tip">
+          <span class="callout-icon">✅</span>
+          <div class="callout-body">
+            <strong>Das funktioniert weiterhin!</strong>
+            <p><code class="ic">Ticket t = new HardwareTicket(...);</code> → ✅ OK! HardwareTicket ist eine konkrete Klasse.<br/><code class="ic">Ticket[] tickets = new Ticket[6];</code> → ✅ OK! Das Array selbst ist kein Objekt.</p>
+          </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 </section>
-
 <div class="divider"></div>
 
-<!-- ===== ZUSATZAUFGABE 4 ===== -->
+<!-- ══════════════════════════════════════════════ -->
+<!-- ZUSATZAUFGABE 4 -->
+<!-- ══════════════════════════════════════════════ -->
 <section id="za4">
-  <div class="container">
-    <div class="reveal">
-      <div class="section-label c-purple">Zusatzaufgabe 4</div>
-      <h2 class="section-title">Ticketsystem mit Polymorphie</h2>
-      <p class="section-desc">Ein komplettes IT-Ticketsystem mit verschiedenen Ticketarten, eigener Prioritätslogik und Auswertung.</p>
-    </div>
+<div class="wrap">
+  <div class="rv">
+    <div class="sec-label c-yellow">Zusatzaufgabe 4</div>
+    <h2 class="sec-title">Komplexes Ticketsystem mit Polymorphie</h2>
+    <p class="sec-desc"><strong>Aufgabe:</strong> Entwickle ein Ticketsystem mit den Klassen <code class="ic">Ticket</code> (abstrakt), <code class="ic">HardwareTicket</code>, <code class="ic">SoftwareTicket</code> und <code class="ic">NetzwerkTicket</code>. Jede Klasse implementiert <code class="ic">prioritaetBerechnen()</code> anders. Speichere 6 Tickets in einem Array und werte Prioritäten aus.</p>
+  </div>
 
-    <div class="reveal">
-      <div class="tree">
-        <div class="tree-root">Ticket (abstrakt)</div>
-        <div class="tree-child"><span>HardwareTicket</span> → geraetetyp, standort | Priorität: immer "Mittel"</div>
-        <div class="tree-child"><span>SoftwareTicket</span> → softwareName, version | Priorität: immer "Niedrig"</div>
-        <div class="tree-child last"><span>NetzwerkTicket</span> → betroffenesSystem, anzahlBetroffeneBenutzer | Priorität: dynamisch!</div>
-      </div>
+  <div class="rv">
+    <div class="tree">
+      <div class="tr">Ticket (abstrakt)</div>
+      <div class="tc"><span>HardwareTicket</span> <small>+ geraetetyp, standort | Priorität: immer "Mittel"</small></div>
+      <div class="tc"><span>SoftwareTicket</span> <small>+ softwareName, version | Priorität: immer "Niedrig"</small></div>
+      <div class="tc last"><span>NetzwerkTicket</span> <small>+ betroffenesSystem, anzahlBetroffeneBenutzer | Priorität: dynamisch!</small></div>
     </div>
+  </div>
 
-    <div class="steps reveal">
-      <div class="step open">
-        <div class="step-header" onclick="toggleStep(this)">
-          <div class="step-num" style="background:#bc8cff25;color:var(--accent-purple)">1</div>
-          <div class="step-info">
-            <div class="step-name">NetzwerkTicket.java – Dynamische Priorität</div>
-            <div class="step-hint">Priorität hängt von der Anzahl betroffener Nutzer ab</div>
-          </div>
-          <div class="step-toggle">▼</div>
+  <div class="steps rv">
+
+    <div class="step open">
+      <div class="step-hdr" onclick="tog(this)">
+        <div class="step-num" style="background:#e3b34122;color:var(--yellow)">1</div>
+        <div class="step-info">
+          <div class="step-name">HardwareTicket.java &amp; SoftwareTicket.java</div>
+          <div class="step-hint">Feste Priorität "Mittel" bzw. "Niedrig"</div>
         </div>
-        <div class="step-body">
-          <p>Das NetzwerkTicket hat eine besonders interessante <code>prioritaetBerechnen()</code>-Methode: Die Priorität wird anhand der betroffenen Nutzer berechnet – das steckt im Objekt selbst!</p>
-          <div class="code-block">
-            <div class="code-header">
-              <div class="code-dots"><div class="code-dot cd-red"></div><div class="code-dot cd-yellow"></div><div class="code-dot cd-green"></div></div>
-              <div class="code-lang">NetzwerkTicket.java</div>
-            </div>
-            <pre><code><span class="kw">public class</span> <span class="cls">NetzwerkTicket</span> <span class="kw">extends</span> <span class="cls">Ticket</span> {
+        <div class="step-arr">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="howto">
+          <div class="howto-title">📋 Schritt-für-Schritt: So löst du das</div>
+          <ol>
+            <li>Neue Klasse <code>HardwareTicket extends Ticket</code></li>
+            <li>Attribute hinzufügen: <code>private String geraetetyp;</code> und <code>private String standort;</code></li>
+            <li>Konstruktor: <code>super(ticketnummer, titel, beschreibung, status);</code> als erste Zeile</li>
+            <li><code>@Override datenAusgeben()</code>: Zuerst <code>basisDatenAusgeben();</code>, dann eigene Felder</li>
+            <li><code>@Override prioritaetBerechnen()</code>: Einfach <code>return "Mittel";</code></li>
+            <li>SoftwareTicket genauso – nur andere Attribute und <code>return "Niedrig";</code></li>
+          </ol>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">HardwareTicket.java</div></div>
+          <pre><code><span class="kw">public class</span> <span class="cls">HardwareTicket</span> <span class="kw">extends</span> <span class="cls">Ticket</span> {
 
-    <span class="kw">private</span> <span class="tp">String</span> betroffenesSystem;
-    <span class="kw">private int</span> anzahlBetroffeneBenutzer;
+    <span class="kw">private</span> <span class="tp">String</span> geraetetyp;  <span class="cm">// z.B. "Laptop", "Drucker", "Monitor"</span>
+    <span class="kw">private</span> <span class="tp">String</span> standort;    <span class="cm">// z.B. "Raum 101"</span>
 
-    <span class="kw">public</span> <span class="cls">NetzwerkTicket</span>(<span class="tp">String</span> ticketnummer, <span class="tp">String</span> titel, <span class="tp">String</span> beschreibung,
-                          <span class="tp">String</span> status, <span class="tp">String</span> betroffenesSystem, <span class="kw">int</span> anzahlBetroffeneBenutzer) {
-        <span class="fn">super</span>(ticketnummer, titel, beschreibung, status);
-        <span class="kw">this</span>.betroffenesSystem = betroffenesSystem;
-        <span class="kw">this</span>.anzahlBetroffeneBenutzer = anzahlBetroffeneBenutzer;
+    <span class="kw">public</span> <span class="cls">HardwareTicket</span>(<span class="tp">String</span> ticketnummer, <span class="tp">String</span> titel, <span class="tp">String</span> beschreibung,
+                           <span class="tp">String</span> status, <span class="tp">String</span> geraetetyp, <span class="tp">String</span> standort) {
+        <span class="fn">super</span>(ticketnummer, titel, beschreibung, status); <span class="cm">// Ticket-Konstruktor</span>
+        <span class="kw">this</span>.geraetetyp = geraetetyp;
+        <span class="kw">this</span>.standort   = standort;
     }
 
     <span class="an">@Override</span>
     <span class="kw">public void</span> <span class="fn">datenAusgeben</span>() {
-        <span class="fn">basisDatenAusgeben</span>();  <span class="cm">// gemeinsame Felder aus Ticket</span>
-        System.out.<span class="fn">println</span>(<span class="str">"Betr. System: "</span> + betroffenesSystem);
-        System.out.<span class="fn">println</span>(<span class="str">"Betr. Nutzer: "</span> + anzahlBetroffeneBenutzer);
+        <span class="fn">basisDatenAusgeben</span>();  <span class="cm">// Gemeinsame Felder aus Ticket ausgeben</span>
+        System.out.<span class="fn">println</span>(<span class="str">"Gerätetyp:    "</span> + geraetetyp);
+        System.out.<span class="fn">println</span>(<span class="str">"Standort:     "</span> + standort);
         System.out.<span class="fn">println</span>(<span class="str">"Priorität:    "</span> + <span class="fn">prioritaetBerechnen</span>());
     }
 
     <span class="an">@Override</span>
     <span class="kw">public</span> <span class="tp">String</span> <span class="fn">prioritaetBerechnen</span>() {
+        <span class="kw">return</span> <span class="str">"Mittel"</span>;  <span class="cm">// Hardware-Ausfall = immer Mittel</span>
+    }
+}</code></pre>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">SoftwareTicket.java</div></div>
+          <pre><code><span class="kw">public class</span> <span class="cls">SoftwareTicket</span> <span class="kw">extends</span> <span class="cls">Ticket</span> {
+
+    <span class="kw">private</span> <span class="tp">String</span> softwareName;  <span class="cm">// z.B. "Microsoft Excel"</span>
+    <span class="kw">private</span> <span class="tp">String</span> version;       <span class="cm">// z.B. "2021"</span>
+
+    <span class="kw">public</span> <span class="cls">SoftwareTicket</span>(<span class="tp">String</span> ticketnummer, <span class="tp">String</span> titel, <span class="tp">String</span> beschreibung,
+                           <span class="tp">String</span> status, <span class="tp">String</span> softwareName, <span class="tp">String</span> version) {
+        <span class="fn">super</span>(ticketnummer, titel, beschreibung, status);
+        <span class="kw">this</span>.softwareName = softwareName;
+        <span class="kw">this</span>.version      = version;
+    }
+
+    <span class="an">@Override</span>
+    <span class="kw">public void</span> <span class="fn">datenAusgeben</span>() {
+        <span class="fn">basisDatenAusgeben</span>();
+        System.out.<span class="fn">println</span>(<span class="str">"Software:     "</span> + softwareName);
+        System.out.<span class="fn">println</span>(<span class="str">"Version:      "</span> + version);
+        System.out.<span class="fn">println</span>(<span class="str">"Priorität:    "</span> + <span class="fn">prioritaetBerechnen</span>());
+    }
+
+    <span class="an">@Override</span>
+    <span class="kw">public</span> <span class="tp">String</span> <span class="fn">prioritaetBerechnen</span>() {
+        <span class="kw">return</span> <span class="str">"Niedrig"</span>;  <span class="cm">// Software-Problem = kein totaler Ausfall</span>
+    }
+}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-hdr" onclick="tog(this)">
+        <div class="step-num" style="background:#e3b34122;color:var(--yellow)">2</div>
+        <div class="step-info">
+          <div class="step-name">NetzwerkTicket.java – Dynamische Priorität</div>
+          <div class="step-hint">if/else Logik je nach Anzahl betroffener Nutzer</div>
+        </div>
+        <div class="step-arr">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="howto">
+          <div class="howto-title">📋 Schritt-für-Schritt: So löst du das</div>
+          <ol>
+            <li>Neue Klasse <code>NetzwerkTicket extends Ticket</code></li>
+            <li>Attribute: <code>private String betroffenesSystem;</code> und <code>private int anzahlBetroffeneBenutzer;</code></li>
+            <li>Konstruktor mit super(...) und eigenen Feldern</li>
+            <li>In <code>prioritaetBerechnen()</code>: if/else-Logik schreiben:
+              <ul>
+                <li>Mehr als 10 Nutzer → <code>return "Hoch";</code></li>
+                <li>Mehr als 3 Nutzer → <code>return "Mittel";</code></li>
+                <li>Sonst → <code>return "Niedrig";</code></li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">NetzwerkTicket.java</div></div>
+          <pre><code><span class="kw">public class</span> <span class="cls">NetzwerkTicket</span> <span class="kw">extends</span> <span class="cls">Ticket</span> {
+
+    <span class="kw">private</span> <span class="tp">String</span> betroffenesSystem;         <span class="cm">// "WLAN", "VPN", "LAN"</span>
+    <span class="kw">private int</span>    anzahlBetroffeneBenutzer;  <span class="cm">// Wie viele Personen betroffen?</span>
+
+    <span class="kw">public</span> <span class="cls">NetzwerkTicket</span>(<span class="tp">String</span> ticketnummer, <span class="tp">String</span> titel, <span class="tp">String</span> beschreibung,
+                           <span class="tp">String</span> status, <span class="tp">String</span> betroffenesSystem, <span class="kw">int</span> anzahlBetroffeneBenutzer) {
+        <span class="fn">super</span>(ticketnummer, titel, beschreibung, status);
+        <span class="kw">this</span>.betroffenesSystem         = betroffenesSystem;
+        <span class="kw">this</span>.anzahlBetroffeneBenutzer  = anzahlBetroffeneBenutzer;
+    }
+
+    <span class="an">@Override</span>
+    <span class="kw">public void</span> <span class="fn">datenAusgeben</span>() {
+        <span class="fn">basisDatenAusgeben</span>();
+        System.out.<span class="fn">println</span>(<span class="str">"Betr. System: "</span> + betroffenesSystem);
+        System.out.<span class="fn">println</span>(<span class="str">"Betr. Nutzer: "</span> + anzahlBetroffeneBenutzer);
+        System.out.<span class="fn">println</span>(<span class="str">"Priorität:    "</span> + <span class="fn">prioritaetBerechnen</span>());
+    }
+
+    <span class="cm">// Die Priorität wird DYNAMISCH berechnet – je nach Anzahl betroffener Nutzer!</span>
+    <span class="cm">// Das macht Polymorphie besonders mächtig: Die Logik steckt im Objekt selbst.</span>
+    <span class="an">@Override</span>
+    <span class="kw">public</span> <span class="tp">String</span> <span class="fn">prioritaetBerechnen</span>() {
         <span class="kw">if</span> (anzahlBetroffeneBenutzer > <span class="num">10</span>) {
-            <span class="kw">return</span> <span class="str">"Hoch"</span>;    <span class="cm">// viele betroffen → kritisch!</span>
+            <span class="kw">return</span> <span class="str">"Hoch"</span>;    <span class="cm">// Viele Nutzer → kritisch, sofort beheben!</span>
         } <span class="kw">else if</span> (anzahlBetroffeneBenutzer > <span class="num">3</span>) {
-            <span class="kw">return</span> <span class="str">"Mittel"</span>;  <span class="cm">// einige betroffen</span>
+            <span class="kw">return</span> <span class="str">"Mittel"</span>;  <span class="cm">// Einige Nutzer → bald beheben</span>
         } <span class="kw">else</span> {
-            <span class="kw">return</span> <span class="str">"Niedrig"</span>; <span class="cm">// wenige betroffen</span>
+            <span class="kw">return</span> <span class="str">"Niedrig"</span>; <span class="cm">// Wenige Nutzer → kann warten</span>
         }
     }
 }</code></pre>
-          </div>
         </div>
       </div>
+    </div>
 
-      <div class="step">
-        <div class="step-header" onclick="toggleStep(this)">
-          <div class="step-num" style="background:#bc8cff25;color:var(--accent-purple)">2</div>
-          <div class="step-info">
-            <div class="step-name">Main.java – Ticket-Array und Auswertung</div>
-            <div class="step-hint">Alle Tickets in einem Array, Prioritäten zählen</div>
-          </div>
-          <div class="step-toggle">▼</div>
+    <div class="step">
+      <div class="step-hdr" onclick="tog(this)">
+        <div class="step-num" style="background:#e3b34122;color:var(--yellow)">3</div>
+        <div class="step-info">
+          <div class="step-name">Main.java – Ticket-Array, Schleife &amp; Auswertung</div>
+          <div class="step-hint">6 Tickets · Ausgabe · Prioritäten zählen</div>
         </div>
-        <div class="step-body">
-          <div class="code-block">
-            <div class="code-header">
-              <div class="code-dots"><div class="code-dot cd-red"></div><div class="code-dot cd-yellow"></div><div class="code-dot cd-green"></div></div>
-              <div class="code-lang">Main.java – Ticketsystem</div>
-            </div>
-            <pre><code><span class="cls">Ticket</span>[] tickets = <span class="kw">new</span> <span class="cls">Ticket</span>[<span class="num">6</span>];
+        <div class="step-arr">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="code-wrap">
+          <div class="code-bar"><div class="code-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="code-fname">Main.java – Ticketsystem</div></div>
+          <pre><code><span class="cm">// ── Array anlegen ─────────────────────────────────────────────────────────</span>
+<span class="cls">Ticket</span>[] tickets = <span class="kw">new</span> <span class="cls">Ticket</span>[<span class="num">6</span>];
 
-tickets[<span class="num">0</span>] = <span class="kw">new</span> <span class="cls">NetzwerkTicket</span>(<span class="str">"T-1001"</span>, <span class="str">"WLAN ausgefallen"</span>,  <span class="str">"..."</span>, <span class="str">"offen"</span>, <span class="str">"WLAN"</span>, <span class="num">25</span>);
-tickets[<span class="num">1</span>] = <span class="kw">new</span> <span class="cls">NetzwerkTicket</span>(<span class="str">"T-1002"</span>, <span class="str">"VPN trennt sich"</span>,    <span class="str">"..."</span>, <span class="str">"offen"</span>, <span class="str">"VPN"</span>,  <span class="num">5</span>);
-tickets[<span class="num">2</span>] = <span class="kw">new</span> <span class="cls">HardwareTicket</span>(<span class="str">"T-2001"</span>, <span class="str">"Laptop startet nicht"</span>, <span class="str">"..."</span>, <span class="str">"offen"</span>, <span class="str">"Laptop"</span>,  <span class="str">"Raum 202"</span>);
-tickets[<span class="num">3</span>] = <span class="kw">new</span> <span class="cls">HardwareTicket</span>(<span class="str">"T-2002"</span>, <span class="str">"Drucker klemmt"</span>,       <span class="str">"..."</span>, <span class="str">"offen"</span>, <span class="str">"Drucker"</span>, <span class="str">"Raum 103"</span>);
-tickets[<span class="num">4</span>] = <span class="kw">new</span> <span class="cls">SoftwareTicket</span>(<span class="str">"T-3001"</span>, <span class="str">"Excel stürzt ab"</span>,      <span class="str">"..."</span>, <span class="str">"offen"</span>, <span class="str">"Excel"</span>,  <span class="str">"2021"</span>);
-tickets[<span class="num">5</span>] = <span class="kw">new</span> <span class="cls">SoftwareTicket</span>(<span class="str">"T-3002"</span>, <span class="str">"Chrome lädt nicht"</span>,    <span class="str">"..."</span>, <span class="str">"offen"</span>, <span class="str">"Chrome"</span>, <span class="str">"120.0"</span>);
+tickets[<span class="num">0</span>] = <span class="kw">new</span> <span class="cls">NetzwerkTicket</span>(<span class="str">"T-1001"</span>, <span class="str">"WLAN ausgefallen"</span>,        <span class="str">"WLAN in Raum 101 nicht erreichbar"</span>, <span class="str">"offen"</span>, <span class="str">"WLAN"</span>, <span class="num">25</span>);
+tickets[<span class="num">1</span>] = <span class="kw">new</span> <span class="cls">NetzwerkTicket</span>(<span class="str">"T-1002"</span>, <span class="str">"VPN trennt sich"</span>,           <span class="str">"VPN-Verbindung bricht ab"</span>,          <span class="str">"offen"</span>, <span class="str">"VPN"</span>,  <span class="num">5</span>);
+tickets[<span class="num">2</span>] = <span class="kw">new</span> <span class="cls">HardwareTicket</span>(<span class="str">"T-2001"</span>, <span class="str">"Laptop startet nicht"</span>,     <span class="str">"Gerät bootet nicht mehr"</span>,           <span class="str">"offen"</span>, <span class="str">"Laptop"</span>,  <span class="str">"Raum 202"</span>);
+tickets[<span class="num">3</span>] = <span class="kw">new</span> <span class="cls">HardwareTicket</span>(<span class="str">"T-2002"</span>, <span class="str">"Drucker kein Papiereinzug"</span>, <span class="str">"Drucker zieht kein Papier"</span>,         <span class="str">"offen"</span>, <span class="str">"Drucker"</span>, <span class="str">"Raum 103"</span>);
+tickets[<span class="num">4</span>] = <span class="kw">new</span> <span class="cls">SoftwareTicket</span>(<span class="str">"T-3001"</span>, <span class="str">"Excel stürzt ab"</span>,          <span class="str">"Excel schließt ohne Fehlermeldung"</span>, <span class="str">"offen"</span>, <span class="str">"Microsoft Excel"</span>, <span class="str">"2021"</span>);
+tickets[<span class="num">5</span>] = <span class="kw">new</span> <span class="cls">SoftwareTicket</span>(<span class="str">"T-3002"</span>, <span class="str">"Chrome lädt nicht"</span>,        <span class="str">"Browser startet nicht"</span>,             <span class="str">"offen"</span>, <span class="str">"Google Chrome"</span>,   <span class="str">"120.0"</span>);
 
-<span class="cm">// Alle Tickets ausgeben:</span>
+<span class="cm">// ── Alle Tickets ausgeben ────────────────────────────────────────────────</span>
 <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < tickets.length; i++) {
     System.out.<span class="fn">println</span>(<span class="str">"--- Ticket "</span> + (i + <span class="num">1</span>) + <span class="str">" ---"</span>);
-    tickets[i].<span class="fn">datenAusgeben</span>();  <span class="cm">// Polymorphie!</span>
+    tickets[i].<span class="fn">datenAusgeben</span>();  <span class="cm">// Polymorphie: jede Klasse gibt ihre eigenen Daten aus</span>
     System.out.<span class="fn">println</span>();
 }
 
-<span class="cm">// Prioritäten zählen:</span>
-<span class="kw">int</span> anzahlHoch = <span class="num">0</span>, anzahlMittel = <span class="num">0</span>, anzahlNiedrig = <span class="num">0</span>;
+<span class="cm">// ── Prioritäten zählen ───────────────────────────────────────────────────</span>
+<span class="kw">int</span> anzahlHoch    = <span class="num">0</span>;
+<span class="kw">int</span> anzahlMittel  = <span class="num">0</span>;
+<span class="kw">int</span> anzahlNiedrig = <span class="num">0</span>;
 
 <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < tickets.length; i++) {
-    <span class="tp">String</span> p = tickets[i].<span class="fn">prioritaetBerechnen</span>();  <span class="cm">// jedes Ticket rechnet selbst!</span>
-    <span class="kw">if</span> (p.<span class="fn">equals</span>(<span class="str">"Hoch"</span>))         anzahlHoch++;
+    <span class="tp">String</span> p = tickets[i].<span class="fn">prioritaetBerechnen</span>();  <span class="cm">// Polymorphie! Jede Klasse rechnet selbst</span>
+
+    <span class="kw">if</span>      (p.<span class="fn">equals</span>(<span class="str">"Hoch"</span>))     anzahlHoch++;
     <span class="kw">else if</span> (p.<span class="fn">equals</span>(<span class="str">"Mittel"</span>))  anzahlMittel++;
     <span class="kw">else if</span> (p.<span class="fn">equals</span>(<span class="str">"Niedrig"</span>)) anzahlNiedrig++;
 }
 
-System.out.<span class="fn">println</span>(<span class="str">"Priorität Hoch:    "</span> + anzahlHoch);
-System.out.<span class="fn">println</span>(<span class="str">"Priorität Mittel:  "</span> + anzahlMittel);
-System.out.<span class="fn">println</span>(<span class="str">"Priorität Niedrig: "</span> + anzahlNiedrig);</code></pre>
-          </div>
-          <div class="result">
-            <div class="result-label">🖥️ Ausgabe (Prioritäts-Auswertung)</div>
-            Priorität Hoch:    1&nbsp;&nbsp;← NetzwerkTicket mit 25 Nutzern<br/>
-            Priorität Mittel:  3&nbsp;&nbsp;← NetzwerkTicket (5 Nutzer) + 2x HardwareTicket<br/>
-            Priorität Niedrig: 2&nbsp;&nbsp;← 2x SoftwareTicket
-          </div>
+System.out.<span class="fn">println</span>(<span class="str">"--- Prioritäts-Auswertung ---"</span>);
+System.out.<span class="fn">println</span>(<span class="str">"Priorität Hoch:    "</span> + anzahlHoch);    <span class="cm">// → 1 (WLAN, 25 Nutzer)</span>
+System.out.<span class="fn">println</span>(<span class="str">"Priorität Mittel:  "</span> + anzahlMittel);  <span class="cm">// → 3 (VPN + 2x Hardware)</span>
+System.out.<span class="fn">println</span>(<span class="str">"Priorität Niedrig: "</span> + anzahlNiedrig); <span class="cm">// → 2 (2x Software)</span></code></pre>
         </div>
+        <div class="output">
+          <div class="output-lbl">🖥️ Ausgabe Ticket 1 (NetzwerkTicket mit 25 Nutzern)</div>
+          Ticketnummer: T-1001<br/>
+          Titel:        WLAN ausgefallen<br/>
+          Beschreibung: WLAN in Raum 101 nicht erreichbar<br/>
+          Status:       offen<br/>
+          Betr. System: WLAN<br/>
+          Betr. Nutzer: 25<br/>
+          Priorität:    Hoch
+        </div>
+        <table>
+          <tr><th>Ticket</th><th>Typ</th><th>Nutzer</th><th>Priorität</th><th>Grund</th></tr>
+          <tr><td>T-1001 WLAN ausgefallen</td><td><span class="tag tag-b">NetzwerkTicket</span></td><td>25</td><td><span class="tag tag-r">Hoch</span></td><td>&gt; 10 Nutzer</td></tr>
+          <tr><td>T-1002 VPN trennt sich</td><td><span class="tag tag-b">NetzwerkTicket</span></td><td>5</td><td><span class="tag tag-o">Mittel</span></td><td>&gt; 3 Nutzer</td></tr>
+          <tr><td>T-2001 Laptop startet nicht</td><td><span class="tag tag-o">HardwareTicket</span></td><td>–</td><td><span class="tag tag-o">Mittel</span></td><td>immer Mittel</td></tr>
+          <tr><td>T-2002 Drucker klemmt</td><td><span class="tag tag-o">HardwareTicket</span></td><td>–</td><td><span class="tag tag-o">Mittel</span></td><td>immer Mittel</td></tr>
+          <tr><td>T-3001 Excel stürzt ab</td><td><span class="tag tag-p">SoftwareTicket</span></td><td>–</td><td><span class="tag tag-g">Niedrig</span></td><td>immer Niedrig</td></tr>
+          <tr><td>T-3002 Chrome lädt nicht</td><td><span class="tag tag-p">SoftwareTicket</span></td><td>–</td><td><span class="tag tag-g">Niedrig</span></td><td>immer Niedrig</td></tr>
+        </table>
       </div>
     </div>
 
-    <!-- Prioritäts-Tabelle -->
-    <div class="reveal" style="margin-top:2rem;">
-      <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:1rem;">📊 Prioritätslogik im Überblick</h3>
-      <table>
-        <tr>
-          <th>Tickettyp</th><th>Bedingung</th><th>Priorität</th>
-        </tr>
-        <tr>
-          <td>NetzwerkTicket</td>
-          <td>anzahlBetroffeneBenutzer &gt; 10</td>
-          <td><span class="tag tag-red">Hoch</span></td>
-        </tr>
-        <tr>
-          <td>NetzwerkTicket</td>
-          <td>anzahlBetroffeneBenutzer &gt; 3</td>
-          <td><span class="tag tag-orange">Mittel</span></td>
-        </tr>
-        <tr>
-          <td>NetzwerkTicket</td>
-          <td>anzahlBetroffeneBenutzer ≤ 3</td>
-          <td><span class="tag tag-green">Niedrig</span></td>
-        </tr>
-        <tr>
-          <td>HardwareTicket</td>
-          <td>immer</td>
-          <td><span class="tag tag-orange">Mittel</span></td>
-        </tr>
-        <tr>
-          <td>SoftwareTicket</td>
-          <td>immer</td>
-          <td><span class="tag tag-green">Niedrig</span></td>
-        </tr>
-      </table>
-    </div>
-
   </div>
+</div>
 </section>
-
 <div class="divider"></div>
 
-<!-- ===== ZUSAMMENFASSUNG ===== -->
-<section style="padding: 4rem 0;">
-  <div class="container">
-    <div class="reveal">
-      <div class="section-label c-blue">Zusammenfassung</div>
-      <h2 class="section-title">Das Wichtigste nochmal kurz</h2>
-    </div>
-    <div class="reveal">
-      <div class="concept blue">
-        <div class="concept-header">
-          <div class="concept-icon bg-blue">⚡</div>
-          <div class="concept-title">Polymorphie auf einen Blick</div>
-        </div>
-        <p>Statischer Typ (links) sagt: "Was darf ich aufrufen?" → nur Methoden der Oberklasse.</p>
-        <p>Dynamischer Typ (rechts bei new) sagt: "Welche Version wird ausgeführt?" → die überschriebene Methode der Unterklasse.</p>
+<!-- ══════════════════════════════════════════════ -->
+<!-- ZUSAMMENFASSUNG -->
+<!-- ══════════════════════════════════════════════ -->
+<section id="zusammenfassung" style="padding:5rem 0 4rem">
+<div class="wrap">
+  <div class="rv">
+    <div class="sec-label c-cyan">Zusammenfassung</div>
+    <h2 class="sec-title">Alle Konzepte auf einen Blick</h2>
+  </div>
+  <div class="rv">
+    <table>
+      <tr><th>Statischer Typ (links)</th><th>Dynamischer Typ (rechts bei new)</th><th>Ausgeführte Methode</th></tr>
+      <tr><td><code>Tier</code></td><td><code>Hund</code></td><td><code>Hund.geraeuschMachen()</code> → "Der Hund bellt."</td></tr>
+      <tr><td><code>Geraet</code></td><td><code>Laptop</code></td><td><code>Laptop.datenAusgeben()</code> → + RAM</td></tr>
+      <tr><td><code>Geraet</code></td><td><code>Drucker</code></td><td><code>Drucker.datenAusgeben()</code> → + Druckverfahren</td></tr>
+      <tr><td><code>Geraet</code></td><td><code>Switch</code></td><td><code>Switch.datenAusgeben()</code> → + Ports + Managed</td></tr>
+      <tr><td><code>Ticket</code></td><td><code>NetzwerkTicket</code></td><td><code>NetzwerkTicket.prioritaetBerechnen()</code> → dynamisch</td></tr>
+    </table>
+  </div>
+  <div class="rv">
+    <div class="ccard cyan">
+      <div class="ccard-head">
+        <div class="ccard-icon" style="background:#76e3ea20">⚡</div>
+        <div class="ccard-title">Polymorphie in einem Satz</div>
       </div>
-      <table>
-        <tr>
-          <th>Statischer Typ</th><th>Dynamischer Typ</th><th>Ausgeführte Methode</th>
-        </tr>
-        <tr>
-          <td><code>Tier</code></td><td><code>Hund</code></td><td><code>Hund.geraeuschMachen()</code></td>
-        </tr>
-        <tr>
-          <td><code>Geraet</code></td><td><code>Laptop</code></td><td><code>Laptop.datenAusgeben()</code></td>
-        </tr>
-        <tr>
-          <td><code>Geraet</code></td><td><code>Drucker</code></td><td><code>Drucker.datenAusgeben()</code></td>
-        </tr>
-        <tr>
-          <td><code>Ticket</code></td><td><code>NetzwerkTicket</code></td><td><code>NetzwerkTicket.prioritaetBerechnen()</code></td>
-        </tr>
-      </table>
+      <p><strong>Gleicher Methodenaufruf, unterschiedliches Verhalten</strong> – Java entscheidet erst zur Laufzeit anhand des tatsächlichen Objekts (dynamischer Typ), welche Version der Methode ausgeführt wird. Dieser Mechanismus heißt <em>dynamisches Binden (Late Binding)</em>.</p>
     </div>
   </div>
+  <div class="rv">
+    <div class="grid2">
+      <div class="mc">
+        <div class="mc-title c-green">✅ Was Polymorphie ermöglicht</div>
+        <p>• Unterschiedliche Objekte in einem Array speichern<br/>• Eine Schleife für alle Typen<br/>• Eine Methode mit Oberklassen-Parameter<br/>• Neue Klassen hinzufügen ohne bestehenden Code zu ändern</p>
+      </div>
+      <div class="mc">
+        <div class="mc-title c-blue">🔑 Die 3 Schlüssel dazu</div>
+        <p>1. <code class="ic">extends</code> – Klasse erbt von Oberklasse<br/>2. <code class="ic">@Override</code> – Methode überschreiben<br/>3. Variable vom Oberklassen-Typ → Unterklassen-Objekt</p>
+      </div>
+    </div>
+  </div>
+</div>
 </section>
 
-<!-- ===== FOOTER ===== -->
-<footer>
-  <div style="font-size:1.5rem;margin-bottom:0.5rem;">☕</div>
-  <div>Java OOP – Modul 4: Polymorphie &nbsp;·&nbsp; Vollständige Lösung mit Erklärungen</div>
-  <div style="margin-top:0.5rem;color:#6e7681;">Alle Java-Dateien liegen im Ordner <code style="color:#58a6ff">modul4/src/</code></div>
+<!-- FOOTER -->
+<footer style="text-align:center;padding:2.5rem 1rem;color:var(--t4);font-size:.8rem;border-top:1px solid var(--b1)">
+  <div style="font-size:1.4rem;margin-bottom:.4rem">☕</div>
+  <div>Java OOP – Modul 4: Polymorphie &nbsp;·&nbsp; Jan Kluth</div>
+  <div style="margin-top:.3rem">Alle Java-Dateien liegen im Ordner <code style="color:var(--blue);font-family:'JetBrains Mono',monospace">modul4/src/</code></div>
 </footer>
 
-<!-- ===== JS ===== -->
 <script>
-  // Toggle Steps
-  function toggleStep(header) {
-    const step = header.parentElement;
-    step.classList.toggle('open');
+  function tog(hdr) {
+    hdr.parentElement.classList.toggle('open');
   }
 
-  // Scroll Reveal
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-      }
-    });
-  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  // Reveal on scroll
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => { if(e.isIntersecting) e.target.classList.add('vis'); });
+  }, { threshold: 0.07, rootMargin:'0px 0px -30px 0px' });
+  document.querySelectorAll('.rv').forEach(el => io.observe(el));
 
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-  // Active nav link on scroll
-  const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('.nav-links a');
-
+  // Active nav
+  const secs = document.querySelectorAll('section[id]');
+  const navAs = document.querySelectorAll('.nav-links a');
   window.addEventListener('scroll', () => {
-    let current = '';
-    sections.forEach(s => {
-      if (window.scrollY >= s.offsetTop - 100) current = s.id;
-    });
-    navLinks.forEach(a => {
-      a.style.color = a.getAttribute('href') === '#' + current
-        ? 'var(--accent-blue)'
-        : '';
-    });
-  });
-
-  // Open all steps that should be open by default
-  document.querySelectorAll('.step.open .step-body').forEach(b => b.style.display = 'block');
+    let cur = '';
+    secs.forEach(s => { if(window.scrollY >= s.offsetTop - 90) cur = s.id; });
+    navAs.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+  }, { passive: true });
 </script>
 </body>
 </html>
