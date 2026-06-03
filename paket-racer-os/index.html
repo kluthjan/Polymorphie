@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Paket Racer OS 📦</title>
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&family=VT323&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --taskbar-h: 48px;
+      --accent: #e8a317;
+      --accent2: #d4380d;
+      --cardboard: #c8a870;
+      --cardboard-dark: #9a7040;
+      --cardboard-light: #e8c898;
+      --win-bg: #f0e6d0;
+      --win-title: #4a3520;
+      --shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #2c5f8a url('bg.png') center/cover no-repeat;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ====== DESKTOP ICONS ====== */
+    .desktop {
+      width: 100%;
+      height: calc(100vh - var(--taskbar-h));
+      position: relative;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .icon {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      cursor: pointer; padding: 8px; border-radius: 8px; width: 80px;
+      transition: background 0.15s;
+    }
+    .icon:hover { background: rgba(255,255,255,0.2); }
+    .icon:active { background: rgba(255,255,255,0.35); }
+    .icon .emoji { font-size: 2.5rem; }
+    .icon span {
+      color: white; font-size: 0.75rem; text-align: center;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.9); word-break: break-word;
+    }
+
+    /* ====== TASKBAR ====== */
+    #taskbar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: var(--taskbar-h);
+      background: rgba(15,15,30,0.92);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; padding: 0 12px; gap: 8px; z-index: 9000;
+    }
+    #start-btn {
+      background: linear-gradient(135deg, #e8a317, #d4380d);
+      border: none; border-radius: 8px; padding: 6px 14px;
+      color: white; font-weight: 700; font-size: 0.9rem; cursor: pointer;
+      display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+      box-shadow: 0 2px 8px rgba(232,163,23,0.4);
+    }
+    #start-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(232,163,23,0.6); }
+    .taskbar-sep { width: 1px; height: 30px; background: rgba(255,255,255,0.15); margin: 0 4px; }
+    .taskbar-win {
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 6px; padding: 4px 12px; color: white; font-size: 0.8rem;
+      cursor: pointer; transition: all 0.15s; max-width: 160px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .taskbar-win:hover { background: rgba(255,255,255,0.2); }
+    .taskbar-win.active { background: rgba(232,163,23,0.3); border-color: var(--accent); }
+    #clock {
+      margin-left: auto; color: white; font-size: 0.85rem;
+      text-align: right; padding: 4px 8px; min-width: 80px;
+    }
+    #clock .time { font-size: 1rem; font-weight: 600; }
+    #clock .date { font-size: 0.7rem; opacity: 0.7; }
+
+    /* ====== WINDOWS ====== */
+    .win {
+      position: fixed; border-radius: 12px; overflow: hidden;
+      box-shadow: var(--shadow); min-width: 300px; min-height: 200px;
+      z-index: 100; display: none; flex-direction: column;
+      border: 1px solid rgba(255,255,255,0.15); resize: both;
+    }
+    .win.active { z-index: 200; }
+    .win.show { display: flex; }
+    .win-title {
+      background: linear-gradient(90deg, var(--cardboard-dark), var(--cardboard));
+      padding: 10px 14px; display: flex; align-items: center; gap: 8px;
+      cursor: move; flex-shrink: 0; border-bottom: 2px solid var(--cardboard-dark);
+    }
+    .win-title .title-icon { font-size: 1.1rem; }
+    .win-title .title-text { color: var(--win-title); font-weight: 700; font-size: 0.9rem; flex: 1; }
+    .win-btns { display: flex; gap: 6px; }
+    .win-btn {
+      width: 14px; height: 14px; border-radius: 50%; border: none;
+      cursor: pointer; font-size: 0; transition: filter 0.15s;
+    }
+    .win-btn:hover { filter: brightness(0.8); }
+    .btn-close { background: #ff5f57; }
+    .btn-min { background: #ffbd2e; }
+    .btn-max { background: #28ca41; }
+    .win-body { background: var(--win-bg); flex: 1; overflow: auto; position: relative; }
+
+    /* ====== START MENU ====== */
+    #start-menu {
+      position: fixed; bottom: calc(var(--taskbar-h) + 8px); left: 12px;
+      width: 340px; background: rgba(20,20,40,0.95); backdrop-filter: blur(30px);
+      border-radius: 16px; border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.5); z-index: 9999;
+      display: none; overflow: hidden; animation: slideUp 0.2s ease;
+    }
+    #start-menu.show { display: block; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .start-header {
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      padding: 20px; display: flex; align-items: center; gap: 14px;
+    }
+    .start-avatar { font-size: 2.5rem; }
+    .start-user { color: white; }
+    .start-user .username { font-weight: 700; font-size: 1.1rem; }
+    .start-user .tagline { font-size: 0.75rem; opacity: 0.8; }
+    .start-items { padding: 10px; }
+    .start-item {
+      display: flex; align-items: center; gap: 14px; padding: 10px 14px;
+      border-radius: 10px; cursor: pointer; color: white; transition: background 0.15s;
+    }
+    .start-item:hover { background: rgba(255,255,255,0.1); }
+    .start-item .si-icon { font-size: 1.5rem; width: 30px; text-align: center; }
+    .start-item .si-text { font-size: 0.9rem; }
+    .start-footer { border-top: 1px solid rgba(255,255,255,0.1); padding: 10px; }
+    .start-shutdown {
+      display: flex; align-items: center; gap: 10px; padding: 8px 14px;
+      border-radius: 8px; cursor: pointer; color: #ff6b6b; font-size: 0.85rem;
+      font-weight: 600; transition: background 0.15s;
+    }
+    .start-shutdown:hover { background: rgba(255,100,100,0.15); }
+
+    /* ====== BSOD ====== */
+    #bsod {
+      position: fixed; inset: 0; background: #0038A8; color: white;
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 99999; font-family: 'Segoe UI', sans-serif; cursor: pointer;
+    }
+    #bsod.show { display: flex; }
+    #bsod .sad { font-size: 8rem; margin-bottom: 20px; animation: wiggle 1s infinite; }
+    @keyframes wiggle { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+    #bsod h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 20px; }
+    #bsod p { font-size: 1rem; opacity: 0.85; text-align: center; max-width: 500px; line-height: 1.8; }
+    #bsod .code { font-family: monospace; background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; margin-top: 20px; }
+    #bsod .restart-hint { margin-top: 30px; font-size: 0.8rem; opacity: 0.6; }
+
+    /* ====== NOTEPAD ====== */
+    .notepad-area {
+      width: 100%; height: 100%; border: none; resize: none;
+      background: #fffef0; font-family: 'Courier New', monospace;
+      font-size: 0.9rem; padding: 14px; outline: none; color: #333;
+    }
+
+    /* ====== FILE EXPLORER ====== */
+    .explorer-bar {
+      background: #e8d8b8; padding: 8px 12px;
+      border-bottom: 1px solid var(--cardboard-dark);
+      display: flex; gap: 8px; align-items: center; font-size: 0.8rem;
+    }
+    .explorer-bar input {
+      flex: 1; border: 1px solid var(--cardboard-dark); border-radius: 4px;
+      padding: 3px 8px; font-size: 0.8rem; background: white;
+    }
+    .explorer-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 10px; padding: 16px;
+    }
+    .exp-item {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      padding: 8px 4px; border-radius: 8px; cursor: pointer; transition: background 0.15s;
+    }
+    .exp-item:hover { background: rgba(200,168,112,0.4); }
+    .exp-item .ei { font-size: 2rem; }
+    .exp-item span { font-size: 0.7rem; text-align: center; color: #333; }
+
+    /* ====== TERMINAL ====== */
+    .terminal-body {
+      background: #0a0a0a; color: #00ff41; font-family: 'VT323', monospace;
+      font-size: 1.1rem; padding: 14px; height: 100%; overflow-y: auto;
+    }
+    .terminal-line { line-height: 1.4; }
+    .terminal-prompt { color: #e8a317; }
+    .terminal-input-line { display: flex; gap: 4px; margin-top: 4px; }
+    .terminal-input {
+      background: transparent; border: none; color: #00ff41;
+      font-family: 'VT323', monospace; font-size: 1.1rem; flex: 1; outline: none;
+    }
+
+    /* ====== MINESWEEPER ====== */
+    .minesweeper {
+      padding: 14px; display: flex; flex-direction: column; align-items: center;
+      gap: 14px; background: var(--win-bg);
+    }
+    .ms-header {
+      display: flex; gap: 20px; align-items: center; background: var(--cardboard);
+      padding: 8px 20px; border-radius: 8px; border: 2px solid var(--cardboard-dark);
+    }
+    .ms-counter { font-family: 'VT323', monospace; font-size: 1.8rem; color: #d4380d; min-width: 40px; text-align: center; }
+    .ms-face { font-size: 1.5rem; cursor: pointer; }
+    .ms-grid {
+      display: inline-grid; gap: 2px; background: var(--cardboard-dark);
+      padding: 3px; border-radius: 4px;
+    }
+    .ms-cell {
+      width: 28px; height: 28px; background: var(--cardboard-light); border: 2px solid;
+      border-color: #fff8e8 var(--cardboard-dark) var(--cardboard-dark) #fff8e8;
+      cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; transition: all 0.05s;
+    }
+    .ms-cell:hover { filter: brightness(0.9); }
+    .ms-cell.revealed { border-color: var(--cardboard-dark); border-width: 1px; background: #d4b878; }
+    .ms-cell.flagged { background: var(--cardboard-light); }
+
+    /* ====== ABOUT ====== */
+    .about-body {
+      padding: 30px; text-align: center; display: flex;
+      flex-direction: column; align-items: center; gap: 14px;
+    }
+    .about-logo { font-size: 4rem; }
+    .about-name { font-size: 1.5rem; font-weight: 700; color: var(--win-title); }
+    .about-ver { color: #888; font-size: 0.85rem; }
+    .about-divider { width: 100%; height: 1px; background: var(--cardboard); margin: 8px 0; }
+    .about-spec { width: 100%; background: #fff; border-radius: 8px; padding: 12px 16px; text-align: left; }
+    .about-spec-row {
+      display: flex; justify-content: space-between; padding: 4px 0;
+      font-size: 0.85rem; border-bottom: 1px solid #f0e6d0;
+    }
+    .about-spec-row:last-child { border: none; }
+    .about-spec-row .label { color: #888; }
+    .about-spec-row .val { font-weight: 600; color: #333; }
+
+    /* ============================
+       BOOT SCREEN – VAN ANIMATION
+       ============================ */
+    #boot {
+      position: fixed; inset: 0; background: #050510;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 99999; transition: opacity 1s;
+    }
+    #boot h1 { color: white; font-size: 2.2rem; font-weight: 700; margin-bottom: 6px; }
+    #boot .boot-sub { color: #888; font-size: 0.9rem; margin-bottom: 40px; }
+
+    /* Road track */
+    .boot-road {
+      width: 500px; position: relative; height: 80px;
+    }
+    .boot-road-track {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 20px;
+      background: #1a1a2a;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    /* Dashed center line animation */
+    .boot-road-track::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 0;
+      width: 200%;
+      height: 3px;
+      margin-top: -1.5px;
+      background: repeating-linear-gradient(90deg, #e8a317 0, #e8a317 20px, transparent 20px, transparent 40px);
+      animation: roadMove 0.4s linear infinite;
+    }
+    @keyframes roadMove { from { transform: translateX(0); } to { transform: translateX(-40px); } }
+
+    /* Progress fill under the road */
+    .boot-road-fill {
+      position: absolute; bottom: 0; left: 0; height: 20px;
+      background: linear-gradient(90deg, #1a3a6a, #2a5a9a);
+      border-radius: 3px;
+      transition: width 0.15s ease;
+      width: 0%;
+    }
+
+    /* The van (SVG drawn in CSS) */
+    #boot-van {
+      position: absolute;
+      bottom: 18px; /* sits on road */
+      left: 0%;
+      font-size: 2.8rem;
+      transition: left 0.15s ease;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+      /* Bounce animation */
+      animation: vanBounce 0.25s ease-in-out infinite alternate;
+    }
+    @keyframes vanBounce {
+      from { transform: translateY(0); }
+      to { transform: translateY(-3px); }
+    }
+    /* Exhaust puff */
+    #boot-van::after {
+      content: '💨';
+      position: absolute;
+      left: -28px; top: 6px;
+      font-size: 1rem;
+      animation: puff 0.6s ease-out infinite;
+      opacity: 0.7;
+    }
+    @keyframes puff {
+      0% { transform: translateX(0) scale(0.5); opacity: 0.7; }
+      100% { transform: translateX(-20px) scale(1.2); opacity: 0; }
+    }
+
+    .boot-progress-label {
+      color: #888; font-size: 0.75rem; margin-top: 14px;
+      font-family: monospace; min-height: 1.2em; text-align: center;
+    }
+    .boot-percent {
+      color: var(--accent); font-weight: 700; font-size: 1rem;
+      margin-top: 4px; font-family: monospace;
+    }
+
+    /* ============================
+       SILBERMANN EASTER EGG
+       ============================ */
+    #silbermann-overlay {
+      position: fixed; inset: 0; z-index: 88888;
+      display: none; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(2px);
+      animation: smFadeIn 0.3s ease;
+    }
+    #silbermann-overlay.show { display: flex; }
+    @keyframes smFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    #silbermann-modal {
+      background: #1a1a2e;
+      border-radius: 16px;
+      border: 2px solid rgba(232,163,23,0.5);
+      box-shadow: 0 0 60px rgba(232,163,23,0.3), var(--shadow);
+      width: min(700px, 95vw);
+      overflow: hidden;
+      animation: smSlideIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes smSlideIn {
+      from { transform: scale(0.7) rotate(-5deg); opacity: 0; }
+      to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+    }
+
+    /* Fake screen-share bar at the top */
+    .sm-share-bar {
+      background: #c0392b;
+      padding: 6px 14px;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.8rem; color: white; font-weight: 600;
+    }
+    .sm-share-dot { width: 10px; height: 10px; border-radius: 50%; background: #ff6b6b; animation: smBlink 1s infinite; }
+    @keyframes smBlink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+    /* Fake Zoom/Teams meeting header */
+    .sm-meeting-bar {
+      background: #18273a;
+      padding: 8px 14px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .sm-meeting-title { color: #aaa; font-size: 0.78rem; }
+    .sm-meeting-host { color: var(--accent); font-size: 0.78rem; font-weight: 600; }
+
+    /* The "shared screen" content (fake desktop) */
+    .sm-fake-desktop {
+      background: #003d7a;
+      padding: 0;
+      position: relative;
+      height: 360px;
+      overflow: hidden;
+    }
+    /* Silbermann character */
+    .sm-silbermann {
+      position: absolute;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      animation: smEntrance 0.6s 0.3s both cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes smEntrance {
+      from { transform: translateX(-50%) translateY(100px); }
+      to   { transform: translateX(-50%) translateY(0); }
+    }
+    .sm-face {
+      font-size: 7rem;
+      display: block;
+      filter: drop-shadow(0 -4px 20px rgba(0,100,255,0.4));
+    }
+    .sm-name-tag {
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      margin-top: 6px;
+      display: inline-block;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* Floating reaction emojis */
+    .sm-reaction {
+      position: absolute;
+      font-size: 1.8rem;
+      animation: smFloatUp 2s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes smFloatUp {
+      0%   { transform: translateY(0) scale(0.5); opacity: 1; }
+      100% { transform: translateY(-120px) scale(1.2); opacity: 0; }
+    }
+
+    /* Participants panel */
+    .sm-participants {
+      position: absolute;
+      top: 10px; right: 10px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .sm-participant {
+      background: rgba(0,0,0,0.6);
+      border-radius: 8px;
+      padding: 4px 10px;
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.75rem; color: white; border: 1px solid rgba(255,255,255,0.1);
+    }
+    .sm-participant-avatar { font-size: 1.2rem; }
+
+    /* Chat bubble */
+    .sm-chat-bubble {
+      position: absolute;
+      bottom: 80px; left: 20px;
+      background: rgba(0,0,0,0.8);
+      border-radius: 12px;
+      padding: 10px 14px;
+      color: white;
+      font-size: 0.82rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      max-width: 220px;
+      animation: smBubble 0.4s 1.2s both ease-out;
+    }
+    @keyframes smBubble { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .sm-chat-bubble .sm-chat-who { color: var(--accent); font-weight: 700; margin-bottom: 4px; font-size: 0.78rem; }
+    .sm-chat-bubble .sm-chat-msg { line-height: 1.4; }
+
+    /* Panic notification */
+    .sm-notif {
+      position: absolute;
+      top: 14px; left: 14px;
+      background: rgba(192,57,43,0.92);
+      border-radius: 10px;
+      padding: 8px 14px;
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.2);
+      animation: smShake 0.4s 0.5s both ease-out;
+      display: flex; align-items: center; gap: 8px;
+    }
+    @keyframes smShake {
+      0%,100% { transform: rotate(0); }
+      25%  { transform: rotate(-3deg); }
+      75%  { transform: rotate(3deg); }
+    }
+
+    /* Bottom controls */
+    .sm-bottom {
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .sm-bottom-msg { color: #888; font-size: 0.8rem; font-style: italic; }
+    .sm-close-btn {
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      border: none; border-radius: 8px; padding: 8px 20px;
+      color: white; font-weight: 700; cursor: pointer; font-size: 0.88rem;
+      transition: all 0.2s;
+    }
+    .sm-close-btn:hover { transform: scale(1.05); filter: brightness(1.1); }
+
+    /* Glitch effect overlay that appears randomly */
+    .sm-glitch {
+      position: absolute; inset: 0;
+      pointer-events: none;
+      background: transparent;
+    }
+    .sm-glitch.active {
+      background: linear-gradient(rgba(255,0,0,0.05) 0%, transparent 5%, transparent 94%, rgba(0,0,255,0.05) 100%);
+      animation: glitchFlash 0.15s steps(1) forwards;
+    }
+    @keyframes glitchFlash { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+  </style>
+</head>
+<body>
+
+<!-- ====== BOOT SCREEN ====== -->
+<div id="boot">
+  <h1>📦 Paket Racer OS</h1>
+  <p class="boot-sub">Version 11.0 (Sehr Schnell Edition)</p>
+
+  <div class="boot-road">
+    <div id="boot-van">🚐</div>
+    <div class="boot-road-fill" id="boot-road-fill"></div>
+    <div class="boot-road-track"></div>
+  </div>
+
+  <div class="boot-progress-label" id="boot-msg">Lade Pakete...</div>
+  <div class="boot-percent" id="boot-percent">0%</div>
+</div>
+
+<!-- ====== DESKTOP ====== -->
+<div class="desktop" id="desktop">
+  <div class="icon" onclick="openWin('explorer')">
+    <span class="emoji">📂</span><span>Datei-Pakete</span>
+  </div>
+  <div class="icon" onclick="openWin('notepad')">
+    <span class="emoji">📝</span><span>Liefer-Notiz</span>
+  </div>
+  <div class="icon" onclick="openWin('terminal')">
+    <span class="emoji">⬛</span><span>PaketShell</span>
+  </div>
+  <div class="icon" onclick="openWin('minesweeper')">
+    <span class="emoji">💣</span><span>PaketSucher</span>
+  </div>
+  <div class="icon" onclick="openWin('about')">
+    <span class="emoji">ℹ️</span><span>Über PaketOS</span>
+  </div>
+  <div class="icon" onclick="openWin('paketracer')">
+    <span class="emoji">🏎️</span><span>Paket Racer</span>
+  </div>
+  <!-- SILBERMANN EASTER EGG ICON -->
+  <div class="icon" onclick="showSilbermann()" id="silbermann-icon" title="Nicht anklicken während der Präsentation!">
+    <span class="emoji">🖥️</span><span>Bildschirm freigeben</span>
+  </div>
+  <div class="icon" onclick="showBSOD()">
+    <span class="emoji">💀</span><span>Windows Update</span>
+  </div>
+</div>
+
+<!-- ====== TASKBAR ====== -->
+<div id="taskbar">
+  <button id="start-btn" onclick="toggleStart()">📦 Start</button>
+  <div class="taskbar-sep"></div>
+  <div id="taskbar-wins"></div>
+  <div id="clock">
+    <div class="time" id="clock-time">00:00</div>
+    <div class="date" id="clock-date">Di. 01.01.</div>
+  </div>
+</div>
+
+<!-- ====== START MENU ====== -->
+<div id="start-menu">
+  <div class="start-header">
+    <div class="start-avatar">🚐</div>
+    <div class="start-user">
+      <div class="username">Paket Fahrer</div>
+      <div class="tagline">paket@racer.os</div>
+    </div>
+  </div>
+  <div class="start-items">
+    <div class="start-item" onclick="openWin('explorer'); toggleStart()"><span class="si-icon">📂</span><span class="si-text">Datei-Pakete</span></div>
+    <div class="start-item" onclick="openWin('notepad'); toggleStart()"><span class="si-icon">📝</span><span class="si-text">Liefer-Notiz</span></div>
+    <div class="start-item" onclick="openWin('terminal'); toggleStart()"><span class="si-icon">⬛</span><span class="si-text">PaketShell</span></div>
+    <div class="start-item" onclick="openWin('minesweeper'); toggleStart()"><span class="si-icon">💣</span><span class="si-text">PaketSucher</span></div>
+    <div class="start-item" onclick="openWin('about'); toggleStart()"><span class="si-icon">ℹ️</span><span class="si-text">Über PaketOS</span></div>
+    <div class="start-item" onclick="openWin('paketracer'); toggleStart()"><span class="si-icon">🏎️</span><span class="si-text">Paket Racer App</span></div>
+    <div class="start-item" onclick="showSilbermann(); toggleStart()"><span class="si-icon">🖥️</span><span class="si-text">Bildschirm freigeben...</span></div>
+  </div>
+  <div class="start-footer">
+    <div class="start-shutdown" onclick="showBSOD()">⚡ Herunterfahren (Windows Update)</div>
+  </div>
+</div>
+
+<!-- ======= WINDOWS ======= -->
+
+<!-- File Explorer -->
+<div class="win" id="win-explorer" style="width:480px;height:360px;top:80px;left:150px">
+  <div class="win-title" onmousedown="startDrag(event,'win-explorer')">
+    <span class="title-icon">📂</span>
+    <span class="title-text">Datei-Pakete</span>
+    <div class="win-btns">
+      <button class="win-btn btn-min" onclick="minWin('explorer')"></button>
+      <button class="win-btn btn-max"></button>
+      <button class="win-btn btn-close" onclick="closeWin('explorer')"></button>
+    </div>
+  </div>
+  <div class="explorer-bar"><span>📍</span><input type="text" value="C:\Pakete\Lieferung" readonly /></div>
+  <div class="win-body">
+    <div class="explorer-grid">
+      <div class="exp-item" ondblclick="alert('📦 Paket wurde geliefert... an die falsche Adresse.')"><span class="ei">📦</span><span>Paket_001</span></div>
+      <div class="exp-item" ondblclick="alert('💔 Paket beschädigt. Klassiker.')"><span class="ei">📦</span><span>Paket_002_kaputt</span></div>
+      <div class="exp-item" ondblclick="alert('🚚 Paket ist noch unterwegs... seit 3 Wochen.')"><span class="ei">🚚</span><span>unterwegs</span></div>
+      <div class="exp-item" ondblclick="alert('🗑️ Dieser Ordner ist leer. Wie das Versprechen des Lieferanten.')"><span class="ei">🗑️</span><span>Papierkorb</span></div>
+      <div class="exp-item" ondblclick="alert('🔐 Zugriffsverweigert. Nicht dein Paket.')"><span class="ei">🔐</span><span>Nachbar_Paket</span></div>
+      <div class="exp-item" ondblclick="alert('📋 Lieferschein: Empfänger nicht angetroffen. War aber zu Hause.')"><span class="ei">📋</span><span>Lieferschein</span></div>
+      <div class="exp-item" ondblclick="openWin('notepad')"><span class="ei">📝</span><span>LIESMICH.txt</span></div>
+      <div class="exp-item" ondblclick="alert('🎵 paket_racer_theme.mp3: VROOOOM 🚐💨')"><span class="ei">🎵</span><span>theme.mp3</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Notepad -->
+<div class="win" id="win-notepad" style="width:420px;height:320px;top:120px;left:220px">
+  <div class="win-title" onmousedown="startDrag(event,'win-notepad')">
+    <span class="title-icon">📝</span>
+    <span class="title-text">Liefer-Notiz – LIESMICH.txt</span>
+    <div class="win-btns">
+      <button class="win-btn btn-min" onclick="minWin('notepad')"></button>
+      <button class="win-btn btn-max"></button>
+      <button class="win-btn btn-close" onclick="closeWin('notepad')"></button>
+    </div>
+  </div>
+  <div class="win-body" style="padding:0">
+    <textarea class="notepad-area">Willkommen bei Paket Racer OS!
+=====================================
+
+Dieses Betriebssystem wurde entwickelt
+von: 📦 GmbH & Paket KG
+
+Systemanforderungen:
+  - Mindestens 1 Paket
+  - Einen Führerschein (optional)
+  - Gutes Timing beim Klingeln
+
+Bekannte Fehler:
+  - Pakete manchmal beim Nachbarn
+  - Windows Update führt zu BSOD
+  - Drucker druckt nie
+  - "Bildschirm freigeben" zeigt
+    manchmal den falschen Bildschirm
+
+Support: Bitte warten. Ihre Lieferung
+ist wichtig für uns.
+
+Viel Spaß! 🚐💨
+</textarea>
+  </div>
+</div>
+
+<!-- Terminal -->
+<div class="win" id="win-terminal" style="width:500px;height:340px;top:100px;left:180px">
+  <div class="win-title" onmousedown="startDrag(event,'win-terminal')">
+    <span class="title-icon">⬛</span>
+    <span class="title-text">PaketShell v1.0</span>
+    <div class="win-btns">
+      <button class="win-btn btn-min" onclick="minWin('terminal')"></button>
+      <button class="win-btn btn-max"></button>
+      <button class="win-btn btn-close" onclick="closeWin('terminal')"></button>
+    </div>
+  </div>
+  <div class="win-body" style="padding:0">
+    <div class="terminal-body" id="terminal-body">
+      <div class="terminal-line">Paket Racer OS [Version 11.0.19042]</div>
+      <div class="terminal-line">(c) 2024 Paket GmbH. Alle Rechte vorbehalten.</div>
+      <div class="terminal-line">&nbsp;</div>
+      <div class="terminal-line">Tippe <span style="color:#e8a317">hilfe</span> für Befehle.</div>
+      <div class="terminal-line">&nbsp;</div>
+      <div class="terminal-input-line">
+        <span class="terminal-prompt">C:\Pakete&gt;</span>
+        <input class="terminal-input" id="terminal-input" type="text" onkeydown="terminalKey(event)" autocomplete="off" spellcheck="false"/>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Minesweeper -->
+<div class="win" id="win-minesweeper" style="width:360px;height:auto;top:100px;left:200px">
+  <div class="win-title" onmousedown="startDrag(event,'win-minesweeper')">
+    <span class="title-icon">💣</span>
+    <span class="title-text">PaketSucher</span>
+    <div class="win-btns">
+      <button class="win-btn btn-min" onclick="minWin('minesweeper')"></button>
+      <button class="win-btn btn-max"></button>
+      <button class="win-btn btn-close" onclick="closeWin('minesweeper')"></button>
+    </div>
+  </div>
+  <div class="win-body" style="padding:0">
+    <div class="minesweeper">
+      <div class="ms-header">
+        <div class="ms-counter" id="ms-bombs">10</div>
+        <div class="ms-face" id="ms-face" onclick="initMinesweeper()">😐</div>
+        <div class="ms-counter" id="ms-timer">000</div>
+      </div>
+      <div class="ms-grid" id="ms-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Paket Racer App -->
+<div class="win" id="win-paketracer" style="width:400px;height:300px;top:150px;left:250px">
+  <div class="win-title" onmousedown="startDrag(event,'win-paketracer')">
+    <span class="title-icon">🏎️</span>
+    <span class="title-text">Paket Racer</span>
+    <div class="win-btns">
+      <button class="win-btn btn-min" onclick="minWin('paketracer')"></button>
+      <button class="win-btn btn-max"></button>
+      <button class="win-btn btn-close" onclick="closeWin('paketracer')"></button>
+    </div>
+  </div>
+  <div class="win-body" style="padding:20px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:15px; background: #222; color: #fff;">
+    <h2 style="color: var(--accent);">Paket Racer 2026</h2>
+    <div style="font-size: 5rem; animation: vanBounce 0.5s infinite alternate;">🚐</div>
+    <p>Der realistischste Pappkarton-Simulator!</p>
+    <button style="padding: 10px 20px; font-size: 1.1rem; background: var(--accent2); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;" onclick="alert('CRITICAL ERROR: Keine Grafikkarte gefunden.\nBenötigt mindestens RTX 4090 für realistische Pappen-Physik.')">Spiel starten 🏁</button>
+  </div>
+</div>
+
+<!-- About -->
+<div class="win" id="win-about" style="width:360px;height:420px;top:100px;left:200px">
+  <div class="win-title" onmousedown="startDrag(event,'win-about')">
+    <span class="title-icon">ℹ️</span>
+    <span class="title-text">Über Paket Racer OS</span>
+    <div class="win-btns">
+      <button class="win-btn btn-min" onclick="minWin('about')"></button>
+      <button class="win-btn btn-max"></button>
+      <button class="win-btn btn-close" onclick="closeWin('about')"></button>
+    </div>
+  </div>
+  <div class="win-body">
+    <div class="about-body">
+      <div class="about-logo">📦</div>
+      <div class="about-name">Paket Racer OS</div>
+      <div class="about-ver">Version 11.0 (Sehr Schnell Edition)</div>
+      <div class="about-divider"></div>
+      <div class="about-spec">
+        <div class="about-spec-row"><span class="label">Prozessor</span><span class="val">Paket-8 @ 1200 km/h</span></div>
+        <div class="about-spec-row"><span class="label">RAM</span><span class="val">16 Kartons</span></div>
+        <div class="about-spec-row"><span class="label">Festplatte</span><span class="val">C:\Pakete (immer voll)</span></div>
+        <div class="about-spec-row"><span class="label">Netzwerk</span><span class="val">📶 Paket-WLAN</span></div>
+        <div class="about-spec-row"><span class="label">Drucker</span><span class="val">❌ Nicht gefunden</span></div>
+        <div class="about-spec-row"><span class="label">Lizenz</span><span class="val">Nicht aktiviert 😔</span></div>
+        <div class="about-spec-row"><span class="label">Updates</span><span class="val">⚠️ 47 ausstehend</span></div>
+      </div>
+      <div style="font-size:0.75rem;color:#999;text-align:center">
+        Paket Racer OS ist nicht verantwortlich für<br/>
+        verlorene Pakete, Nachbar-Lieferungen oder<br/>
+        plötzliche BSODs durch Windows Update.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BSOD -->
+<div id="bsod" onclick="hideBSOD()">
+  <div class="sad">😢</div>
+  <h1>Ihr Paket kann nicht geliefert werden.</h1>
+  <p>Ein Problem wurde festgestellt und Paket Racer OS wurde heruntergefahren,<br/>um Ihr Paket zu schützen.</p>
+  <p style="margin-top:16px">STOP: WINDOWS_UPDATE_DETECTED<br/>PAKET_NICHT_AUFFINDBAR (0x000000DP)</p>
+  <div class="code">KERNEL_PAKET_EXCEPTION</div>
+  <div class="restart-hint">Zum Neustart klicken 📦</div>
+</div>
+
+<!-- ============================
+     SILBERMANN EASTER EGG MODAL
+     ============================ -->
+<div id="silbermann-overlay">
+  <div id="silbermann-modal">
+
+    <!-- Fake screen-share notification bar -->
+    <div class="sm-share-bar">
+      <div class="sm-share-dot"></div>
+      ⚠️ &nbsp;Sie teilen jetzt: Gesamter Bildschirm &nbsp;|&nbsp; Alle Teilnehmer sehen Ihren Bildschirm
+      <span style="margin-left:auto;opacity:0.7;font-size:0.75rem">Teams · Besprechung</span>
+    </div>
+
+    <!-- Fake meeting header -->
+    <div class="sm-meeting-bar">
+      <span class="sm-meeting-title">📡 Modul 4 – Präsentation – Cisco Packet Tracer</span>
+      <span class="sm-meeting-host">👨‍🏫 Silbermann (Moderator)</span>
+    </div>
+
+    <!-- The "accidentally shared" desktop view -->
+    <div class="sm-fake-desktop" id="sm-fake-desktop">
+
+      <!-- Glitch overlay -->
+      <div class="sm-glitch" id="sm-glitch"></div>
+
+      <!-- Panic notification top-left -->
+      <div class="sm-notif">
+        🚨 &nbsp;FALSCHER BILDSCHIRM! Du zeigst Paket Racer OS!
+      </div>
+
+      <!-- Participants panel (right side) -->
+      <div class="sm-participants">
+        <div class="sm-participant"><span class="sm-participant-avatar">😰</span> Du (sprichst)</div>
+        <div class="sm-participant"><span class="sm-participant-avatar">😂</span> Robert</div>
+        <div class="sm-participant"><span class="sm-participant-avatar">🦀</span> Anika</div>
+        <div class="sm-participant"><span class="sm-participant-avatar">😶</span> Daniel M.</div>
+        <div class="sm-participant"><span class="sm-participant-avatar">👨‍🏫</span> Silbermann</div>
+      </div>
+
+      <!-- Chat bubble bottom-left -->
+      <div class="sm-chat-bubble">
+        <div class="sm-chat-who">Robert 😂</div>
+        <div class="sm-chat-msg">Jan kannst du mal auf Packet Tracer wechseln... oder willst du uns dein OS zeigen? 💀</div>
+      </div>
+
+      <!-- SILBERMANN CHARACTER – appears dramatically -->
+      <div class="sm-silbermann" id="sm-silbermann">
+        <span class="sm-face">👨‍💼</span>
+        <div class="sm-name-tag">Herr Silbermann – "Ich sehe alles."</div>
+      </div>
+
+      <!-- Floating reaction emojis (JS will spawn them) -->
+    </div>
+
+    <!-- Bottom -->
+    <div class="sm-bottom">
+      <span class="sm-bottom-msg">😬 Tipp: Alt+Tab schneller als du denkst...</span>
+      <button class="sm-close-btn" onclick="hideSilbermann()">🏃 ALT+TAB (schnell!)</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ====== CLOCK ======
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const days = ['So.','Mo.','Di.','Mi.','Do.','Fr.','Sa.'];
+  const d = days[now.getDay()];
+  const dd = String(now.getDate()).padStart(2,'0');
+  const mm = String(now.getMonth()+1).padStart(2,'0');
+  document.getElementById('clock-time').textContent = h+':'+m;
+  document.getElementById('clock-date').textContent = d+' '+dd+'.'+mm+'.';
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ============================
+//  BOOT SCREEN – VAN ANIMATION
+// ============================
+const bootMsgs = [
+  'Lade Pakete...', 'Suche Adresse...', 'Klingel wird gedrückt...',
+  'Niemand öffnet...', 'Hinterlasse Benachrichtigung...',
+  'Fahre weiter...', 'Paket Racer OS bereit! 🚐'
+];
+let bootProgress = 0;
+const bootVan = document.getElementById('boot-van');
+const bootFill = document.getElementById('boot-road-fill');
+const bootMsg = document.getElementById('boot-msg');
+const bootPct = document.getElementById('boot-percent');
+const bootEl = document.getElementById('boot');
+
+function bootStep() {
+  bootProgress += Math.random() * 16 + 6;
+  if (bootProgress > 100) bootProgress = 100;
+
+  // Van position: from ~0% to ~90% of the road width (leave room for van size)
+  const vanPos = Math.min(bootProgress * 0.88, 88);
+  bootVan.style.left = vanPos + '%';
+  bootFill.style.width = bootProgress + '%';
+
+  const msgIdx = Math.min(Math.floor(bootProgress / 100 * bootMsgs.length), bootMsgs.length - 1);
+  bootMsg.textContent = bootMsgs[msgIdx];
+  bootPct.textContent = Math.floor(bootProgress) + '%';
+
+  if (bootProgress < 100) {
+    setTimeout(bootStep, 180 + Math.random() * 280);
+  } else {
+    bootPct.textContent = '100%';
+    bootMsg.textContent = '🚐 Paket Racer OS bereit!';
+    setTimeout(() => {
+      bootEl.style.opacity = '0';
+      setTimeout(() => bootEl.style.display = 'none', 900);
+    }, 800);
+  }
+}
+setTimeout(bootStep, 400);
+
+// ====== WINDOW MANAGEMENT ======
+let zCounter = 100;
+const minimized = {};
+
+function openWin(name) {
+  const el = document.getElementById('win-' + name);
+  if (!el) return;
+  el.classList.add('show');
+  el.style.display = 'flex';
+  minimized[name] = false;
+  bringToFront(name);
+  updateTaskbar();
+  if (name === 'minesweeper' && !el.dataset.init) {
+    el.dataset.init = '1';
+    initMinesweeper();
+  }
+}
+
+function closeWin(name) {
+  const el = document.getElementById('win-' + name);
+  if (!el) return;
+  el.classList.remove('show');
+  el.style.display = 'none';
+  delete minimized[name];
+  updateTaskbar();
+}
+
+function minWin(name) {
+  const el = document.getElementById('win-' + name);
+  if (!el) return;
+  el.style.display = 'none';
+  minimized[name] = true;
+  updateTaskbar();
+}
+
+function bringToFront(name) {
+  zCounter++;
+  const el = document.getElementById('win-' + name);
+  if (el) {
+    el.style.zIndex = zCounter;
+    document.querySelectorAll('.win').forEach(w => w.classList.remove('active'));
+    el.classList.add('active');
+  }
+}
+
+document.querySelectorAll('.win').forEach(win => {
+  win.addEventListener('mousedown', () => bringToFront(win.id.replace('win-', '')));
+});
+
+function updateTaskbar() {
+  const container = document.getElementById('taskbar-wins');
+  container.innerHTML = '';
+  document.querySelectorAll('.win').forEach(win => {
+    const name = win.id.replace('win-', '');
+    const isOpen = win.classList.contains('show');
+    const isMin = minimized[name];
+    if (!isOpen && !isMin) return;
+    const title = win.querySelector('.title-text')?.textContent || name;
+    const btn = document.createElement('div');
+    btn.className = 'taskbar-win' + (win.classList.contains('active') ? ' active' : '');
+    btn.textContent = title;
+    btn.onclick = () => {
+      if (isMin) {
+        win.style.display = 'flex'; minimized[name] = false;
+        win.classList.add('show'); bringToFront(name); updateTaskbar();
+      } else if (win.classList.contains('active')) {
+        win.style.display = 'none'; minimized[name] = true;
+        win.classList.remove('active'); updateTaskbar();
+      } else {
+        win.style.display = 'flex'; bringToFront(name); updateTaskbar();
+      }
+    };
+    container.appendChild(btn);
+  });
+}
+
+// ====== DRAG ======
+let dragging = null, dragOffX, dragOffY;
+function startDrag(e, name) {
+  const el = document.getElementById('win-' + name);
+  dragging = el;
+  dragOffX = e.clientX - el.offsetLeft;
+  dragOffY = e.clientY - el.offsetTop;
+  bringToFront(name);
+}
+document.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  let x = Math.max(0, Math.min(e.clientX - dragOffX, window.innerWidth - dragging.offsetWidth));
+  let y = Math.max(0, Math.min(e.clientY - dragOffY, window.innerHeight - 48 - dragging.offsetHeight));
+  dragging.style.left = x + 'px';
+  dragging.style.top = y + 'px';
+});
+document.addEventListener('mouseup', () => dragging = null);
+
+// ====== START MENU ======
+function toggleStart() {
+  document.getElementById('start-menu').classList.toggle('show');
+}
+document.addEventListener('click', e => {
+  const sm = document.getElementById('start-menu');
+  const sb = document.getElementById('start-btn');
+  if (!sm.contains(e.target) && e.target !== sb) sm.classList.remove('show');
+});
+
+// ====== BSOD ======
+function showBSOD() {
+  document.getElementById('bsod').classList.add('show');
+  document.getElementById('start-menu').classList.remove('show');
+}
+function hideBSOD() { document.getElementById('bsod').classList.remove('show'); }
+
+// ============================
+//  SILBERMANN EASTER EGG
+// ============================
+let reactionInterval = null;
+const reactions = ['😂','💀','👀','🤣','😱','🙈','🔥','💯','😅','🫣'];
+
+function showSilbermann() {
+  document.getElementById('silbermann-overlay').classList.add('show');
+  // Spawn floating reactions every 600ms
+  reactionInterval = setInterval(spawnReaction, 600);
+  // Occasional glitch
+  setInterval(() => {
+    const g = document.getElementById('sm-glitch');
+    g.classList.add('active');
+    setTimeout(() => g.classList.remove('active'), 150);
+  }, 2500);
+}
+
+function hideSilbermann() {
+  document.getElementById('silbermann-overlay').classList.remove('show');
+  clearInterval(reactionInterval);
+}
+
+// Close overlay on backdrop click
+document.getElementById('silbermann-overlay').addEventListener('click', function(e) {
+  if (e.target === this) hideSilbermann();
+});
+
+function spawnReaction() {
+  const desktop = document.getElementById('sm-fake-desktop');
+  const span = document.createElement('span');
+  span.className = 'sm-reaction';
+  span.textContent = reactions[Math.floor(Math.random() * reactions.length)];
+  span.style.left = (Math.random() * 80 + 5) + '%';
+  span.style.bottom = '20px';
+  span.style.animationDuration = (1.5 + Math.random()) + 's';
+  span.style.animationDelay = (Math.random() * 0.3) + 's';
+  desktop.appendChild(span);
+  setTimeout(() => span.remove(), 3000);
+}
+
+// ====== TERMINAL ======
+const termCmds = {
+  hilfe: () => `Verfügbare Befehle:\n  hilfe       - Diese Hilfe\n  paket       - Paket Status\n  liefere     - Lieferung starten\n  ls          - Pakete auflisten\n  silbermann  - ???\n  update      - Windows Update (Vorsicht!)\n  matrix      - ???\n  clear       - Bildschirm leeren`,
+  paket: () => `Tracking: DE123456789\nStatus: 📍 Auf dem Weg... seit 3 Wochen\nLetzte Aktivität: Vor Ihrer Tür (angeblich)`,
+  liefere: () => `🚚 Starte Lieferung...\n⚠️  Empfänger nicht angetroffen\n📋 Benachrichtigung hinterlassen\n✅ Erfolgreich geliefert! (zum Nachbarn)`,
+  ls: () => `Paket_001.box\nPaket_002_kaputt.box\nPaket_003_vermisst.box\nNachbar_Paket.box  (nicht anfassen!)\nLieferschein.pdf`,
+  silbermann: () => { setTimeout(showSilbermann, 300); return '👨‍💼 Starte Bildschirmfreigabe...\n⚠️  WARNUNG: Falscher Bildschirm ausgewählt!'; },
+  update: () => { setTimeout(showBSOD, 800); return '⚠️ Windows Update wird gestartet...\n💀 Bitte warten...'; },
+  matrix: () => `Wake up, Paket-Fahrer...\nThe Matrix has you...\n📦📦📦📦📦📦📦📦\n📦      📦      📦\n📦  Follow the  📦\n📦  white van   📦\n📦📦📦📦📦📦📦📦`,
+  clear: () => '__clear__',
+};
+
+function terminalKey(e) {
+  if (e.key !== 'Enter') return;
+  const input = document.getElementById('terminal-input');
+  const cmd = input.value.trim().toLowerCase();
+  input.value = '';
+  const body = document.getElementById('terminal-body');
+  const inputLine = body.querySelector('.terminal-input-line');
+
+  const cmdLine = document.createElement('div');
+  cmdLine.className = 'terminal-line';
+  cmdLine.innerHTML = `<span class="terminal-prompt">C:\\Pakete&gt;</span> ${cmd}`;
+  body.insertBefore(cmdLine, inputLine);
+
+  if (cmd) {
+    const fn = termCmds[cmd] || (() => `'${cmd}' wird nicht erkannt. Tippe 'hilfe'.`);
+    const result = fn();
+    if (result === '__clear__') {
+      body.querySelectorAll('.terminal-line').forEach(l => l.remove());
+    } else {
+      result.split('\n').forEach(line => {
+        const l = document.createElement('div');
+        l.className = 'terminal-line';
+        l.textContent = line;
+        body.insertBefore(l, inputLine);
+      });
+    }
+  }
+  body.scrollTop = body.scrollHeight;
+}
+
+// ====== MINESWEEPER ======
+const MS_ROWS = 9, MS_COLS = 9, MS_BOMBS = 10;
+let msBoard = [], msRevealed = [], msFlagged = [], msGameOver = false, msTimer = 0, msInterval = null;
+
+function initMinesweeper() {
+  clearInterval(msInterval);
+  msTimer = 0; msGameOver = false;
+  document.getElementById('ms-face').textContent = '😐';
+  document.getElementById('ms-timer').textContent = '000';
+  document.getElementById('ms-bombs').textContent = MS_BOMBS;
+  msBoard = Array(MS_ROWS).fill(null).map(() => Array(MS_COLS).fill(0));
+  msRevealed = Array(MS_ROWS).fill(null).map(() => Array(MS_COLS).fill(false));
+  msFlagged = Array(MS_ROWS).fill(null).map(() => Array(MS_COLS).fill(false));
+  let placed = 0;
+  while (placed < MS_BOMBS) {
+    const r = Math.floor(Math.random() * MS_ROWS), c = Math.floor(Math.random() * MS_COLS);
+    if (msBoard[r][c] !== -1) { msBoard[r][c] = -1; placed++; }
+  }
+  for (let r = 0; r < MS_ROWS; r++) for (let c = 0; c < MS_COLS; c++) {
+    if (msBoard[r][c] === -1) continue;
+    let n = 0;
+    for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+      const nr = r+dr, nc = c+dc;
+      if (nr>=0&&nr<MS_ROWS&&nc>=0&&nc<MS_COLS&&msBoard[nr][nc]===-1) n++;
+    }
+    msBoard[r][c] = n;
+  }
+  renderMinesweeper();
+}
+
+function renderMinesweeper() {
+  const grid = document.getElementById('ms-grid');
+  grid.style.gridTemplateColumns = `repeat(${MS_COLS}, 28px)`;
+  grid.innerHTML = '';
+  const numColors = ['','#0000ff','#007b00','#ff0000','#00007b','#7b0000','#007b7b','#000','#7b7b7b'];
+  for (let r = 0; r < MS_ROWS; r++) for (let c = 0; c < MS_COLS; c++) {
+    const cell = document.createElement('div');
+    cell.className = 'ms-cell' + (msRevealed[r][c] ? ' revealed' : '') + (msFlagged[r][c] ? ' flagged' : '');
+    if (msRevealed[r][c]) {
+      if (msBoard[r][c] === -1) cell.textContent = '💣';
+      else if (msBoard[r][c] > 0) { cell.textContent = msBoard[r][c]; cell.style.color = numColors[msBoard[r][c]]; }
+    } else if (msFlagged[r][c]) { cell.textContent = '🚩'; }
+    cell.addEventListener('click', () => msClick(r, c));
+    cell.addEventListener('contextmenu', e => { e.preventDefault(); msFlag(r, c); });
+    grid.appendChild(cell);
+  }
+}
+
+function msClick(r, c) {
+  if (msGameOver || msRevealed[r][c] || msFlagged[r][c]) return;
+  if (msTimer === 0) {
+    msInterval = setInterval(() => {
+      msTimer++;
+      document.getElementById('ms-timer').textContent = String(msTimer).padStart(3, '0');
+    }, 1000);
+  }
+  if (msBoard[r][c] === -1) {
+    msGameOver = true; clearInterval(msInterval); msRevealAll();
+    document.getElementById('ms-face').textContent = '😵'; return;
+  }
+  msReveal(r, c); renderMinesweeper(); checkWin();
+}
+
+function msReveal(r, c) {
+  if (r<0||r>=MS_ROWS||c<0||c>=MS_COLS||msRevealed[r][c]||msFlagged[r][c]) return;
+  msRevealed[r][c] = true;
+  if (msBoard[r][c] === 0) for (let dr=-1;dr<=1;dr++) for (let dc=-1;dc<=1;dc++) msReveal(r+dr, c+dc);
+}
+
+function msFlag(r, c) {
+  if (msGameOver || msRevealed[r][c]) return;
+  msFlagged[r][c] = !msFlagged[r][c];
+  document.getElementById('ms-bombs').textContent = MS_BOMBS - msFlagged.flat().filter(Boolean).length;
+  renderMinesweeper();
+}
+
+function msRevealAll() {
+  for (let r=0;r<MS_ROWS;r++) for (let c=0;c<MS_COLS;c++) msRevealed[r][c] = true;
+  renderMinesweeper();
+}
+
+function checkWin() {
+  for (let r=0;r<MS_ROWS;r++) for (let c=0;c<MS_COLS;c++) if (msBoard[r][c]!==-1&&!msRevealed[r][c]) return;
+  msGameOver = true; clearInterval(msInterval);
+  document.getElementById('ms-face').textContent = '😎';
+  setTimeout(() => alert('🎉 Alle Pakete gefunden! Du bist ein echter Paket Racer!'), 100);
+}
+</script>
+</body>
+</html>
