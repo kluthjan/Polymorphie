@@ -1,0 +1,8 @@
+# Eclipse Build-Ausgabe (kompilierte .class-Dateien) – nicht in Git nötig
+bin/
+*.class
+
+# Eclipse spezifische Dateien (optional, je nach Präferenz)
+.classpath
+.project
+.settings/
